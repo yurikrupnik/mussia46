@@ -1,0 +1,72 @@
+---
+# Instance: testkube
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  labels:
+    app.kubernetes.io/managed-by: timoni
+    app.kubernetes.io/name: testkube
+    app.kubernetes.io/version: 2.4.0-2
+  name: testkube
+  namespace: flux-system
+spec:
+  targetNamespace: testkube
+  chart:
+    metadata:
+      labels:
+        app.kubernetes.io/managed-by: timoni
+        app.kubernetes.io/name: testkube
+        app.kubernetes.io/version: 2.4.0-2
+    spec:
+      chart: testkube
+      interval: 60m
+      sourceRef:
+        kind: HelmRepository
+        name: testkube
+      version: 2.0.x
+  install:
+    createNamespace: true
+    crds: Create
+    disableWait: false
+    disableWaitForJobs: false
+    remediation:
+      retries: -1
+  interval: 60m
+  releaseName: testkube
+  test:
+    enable: false
+  timeout: 5m
+  upgrade:
+    crds: CreateReplace
+    disableWait: false
+    disableWaitForJobs: false
+    remediation:
+      retries: -1
+  values:
+    installCRDs: true
+    mongodb.enabled: false
+    testkube-api.cloud.envId: tkcenv_c72da0c2e1792d2c
+    testkube-api.cloud.key: tkcagnt_3f99186b2d07881577956aba5df049}
+    testkube-api.cloud.orgId: tkcorg_9f5a2231a41b2b50
+    testkube-api.cloud.url: agent.testkube.io:443
+    testkube-api.minio.enabled: false
+    testkube-dashboard.enabled: false
+    testkube-logs-service.pro.url: logs.testkube.io:443
+    testkube-logs.pro.envId: tkcenv_c72da0c2e1792d2c
+    testkube-logs.pro.key: tkcagnt_3f99186b2d07881577956aba5df049
+    testkube-logs.pro.orgId: tkcorg_9f5a2231a41b2b50
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  labels:
+    app.kubernetes.io/managed-by: timoni
+    app.kubernetes.io/name: testkube
+    app.kubernetes.io/version: 2.4.0-2
+  name: testkube
+  namespace: flux-system
+spec:
+  interval: 12h
+  provider: generic
+  url: https://kubeshop.github.io/helm-charts

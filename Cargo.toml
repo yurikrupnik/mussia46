@@ -1,6 +1,85 @@
 [workspace]
-resolver = "2"
-members = []
+resolver = '2'
+members = [
+	'libs/proc_macros',
+	'libs/models',
+	'libs/generals',
+	'libs/cli',
+	'libs/services',
+	'libs/rpc',
+	'libs/shared',
+	'apps/playground/api',
+	'apps/playground/cli',
+	'apps/playground/operator',
+]
+
+[workspace.lints.rust]
+unsafe_code = 'forbid'
+
+[workspace.dependencies]
+proc_macros = { path = 'libs/proc_macros' }
+services = { path = 'libs/services' }
+cli = { path = 'libs/cli' }
+models = { path = 'libs/models' }
+generals = { path = 'libs/generals' }
+strum = { version = '0.26', features = ['derive'] }
+anyhow = '1.0'
+reqwest = { version = '0.12', features = ['json'] }
+axum = { version = '0.8', features = ['default', 'tracing'] }
+futures-executor = { version = '0.3', features = ['default'] }
+axum-extra = { version = '0.10', features = ['typed-header'] }
+http = { version = '1.2', features = ['default'] }
+tower-service = { version = '0.3' }
+clap = { version = '4.5', features = ['derive'] }
+tower = { version = '0.5', features = ['util'] }
+tower-http = { version = '0.6', features = ['timeout', 'trace', 'compression-full', 'decompression-full'] }
+tower-cookies = '0.11'
+tokio = { version = '1.41', features = ['macros', 'signal', 'rt-multi-thread'] }
+tokio-stream = '0.1'
+headers = '0.4'
+utoipa = { version = '5.2', features = ['uuid', 'macros'] }
+utoipa-swagger-ui = { version = '8.0', features = ['axum'] }
+utoipa-redoc = { version = '5.0.0', features = ['axum'] }
+utoipa-rapidoc = { version = '5.0', features = ['axum'] }
+utoipa-scalar = { version = '0.2', features = ['axum'] }
+serde = { version = '1.0', features = ['derive'] }
+serde_json = { version = '1.0' }
+serde_yaml = { version = '0.9' }
+futures = '0.3'
+tracing-subscriber = { version = '0.3', features = ['env-filter', 'json', 'serde_json'] }
+tracing = '0.1'
+tonic = { version = '0.12', features = ['router', 'default', 'prost', 'server'] }
+prost = { version = '0.13', features = ['default'] }
+log = '0.4'
+chrono = '0.4'
+tabled = '0.17'
+thiserror = '2.0'
+validator = { version = '0.19', features = ['derive'] }
+time = { version = '0.3', features = ['formatting', 'parsing', 'serde'] }
+async-trait = '0.1'
+derive_more = { version = '1.0', features = ['from', 'display'] }
+ts-rs = { version = '10.0', features = ['serde-compat'] }
+mongodb = { version = '3.1.1', features = ['default'] }
+redis = { version = '0.27.6', features = ['serde', 'serde_json', 'async-trait', 'aio', 'r2d2', 'tokio-comp'] }
+sqlx = { version = '0.8.2', default-features = false, features = ['postgres', 'runtime-tokio-rustls', 'macros', 'uuid', 'chrono', 'migrate'] }
+bb8-redis = { version = '0.18' }
+bb8 = { version = '0.9', features = ['default'] }
+uuid = { version = '1.10', features = ['serde', 'v4'] }
+metrics = { version = '0.24', default-features = false }
+metrics-exporter-prometheus = { version = '0.16', default-features = false }
+toml = '0.8'
+influxdb2 = { version = '0.5.2', features = ['rustls'] }
+influxdb2-derive = '0.1.1'
+num-traits = '0.2'
+crossterm = { version = '0.28.1', default-features = false, features = ['serde'] }
+ratatui = { version = '0.29.0', features = ['default'] }
+color-eyre = { version = '0.6.3', features = ['default'] }
+eyre = { version = '0.6.12', features = ['default'] }
+k8s-openapi = { version = '0.24.0', features = ['latest'] }
+kube = { version = '0.98.0', features = ['derive', 'runtime'] }
 
 [profile.release]
+opt-level = 'z'
+codegen-units = 1
+strip = true
 lto = true

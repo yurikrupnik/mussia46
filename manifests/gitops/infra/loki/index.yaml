@@ -1,0 +1,48 @@
+---
+# Instance: loki
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: loki
+  namespace: flux-system
+spec:
+  targetNamespace: loki
+  chart:
+    spec:
+      chart: loki
+      interval: 60m
+      sourceRef:
+        kind: HelmRepository
+        name: grafana
+      version: 6.24.*
+  interval: 60m
+  install:
+    createNamespace: true
+    crds: Create
+    disableWait: false
+    disableWaitForJobs: false
+    remediation:
+      retries: -1
+  releaseName: loki
+  test:
+    enable: false
+  timeout: 5m
+  upgrade:
+    crds: CreateReplace
+    disableWait: false
+    disableWaitForJobs: false
+    remediation:
+      retries: -1
+  values:
+    installCRDs: true
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: grafana
+  namespace: flux-system
+spec:
+  interval: 12h
+  provider: generic
+  url: https://grafana.github.io/helm-charts

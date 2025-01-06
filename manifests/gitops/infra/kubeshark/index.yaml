@@ -1,0 +1,56 @@
+---
+# Instance: kubeshark
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: kubeshark
+  namespace: flux-system
+spec:
+  targetNamespace: kubeshark
+  chart:
+    metadata:
+      labels:
+        app.kubernetes.io/managed-by: timoni
+        app.kubernetes.io/name: kubeshark
+        app.kubernetes.io/version: 2.4.0-2
+    spec:
+      chart: kubeshark
+      interval: 60m
+      sourceRef:
+        kind: HelmRepository
+        name: kubeshark
+      version: 52.3.*
+  install:
+    createNamespace: true
+    crds: Create
+    disableWait: false
+    disableWaitForJobs: false
+    remediation:
+      retries: -1
+  interval: 60m
+  releaseName: komoplane
+  test:
+    enable: false
+  timeout: 5m
+  upgrade:
+    crds: CreateReplace
+    disableWait: false
+    disableWaitForJobs: false
+    remediation:
+      retries: -1
+  values: { }
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  labels:
+    app.kubernetes.io/managed-by: timoni
+    app.kubernetes.io/name: kubeshark
+    app.kubernetes.io/version: 2.4.0-2
+  name: kubeshark
+  namespace: flux-system
+spec:
+  interval: 12h
+  provider: generic
+  url: https://helm.kubeshark.co

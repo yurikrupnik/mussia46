@@ -1,0 +1,48 @@
+---
+# Instance: argo-cd
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: argo-cd
+  namespace: flux-system
+spec:
+  targetNamespace: argo-cd
+  chart:
+    spec:
+      chart: argo-cd
+      interval: 60m
+      sourceRef:
+        kind: HelmRepository
+        name: argo
+      version: 7.7.*
+  interval: 60m
+  install:
+    createNamespace: true
+    crds: Create
+    disableWait: false
+    disableWaitForJobs: false
+    remediation:
+      retries: -1
+  releaseName: argo-cd
+  test:
+    enable: false
+  timeout: 5m
+  upgrade:
+    crds: CreateReplace
+    disableWait: false
+    disableWaitForJobs: false
+    remediation:
+      retries: -1
+  values:
+    installCRDs: true
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: argo
+  namespace: flux-system
+spec:
+  interval: 12h
+  provider: generic
+  url: https://argoproj.github.io/argo-helm

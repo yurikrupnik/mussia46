@@ -1,0 +1,27 @@
+[package]
+name = "shared"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+axum.workspace = true
+tokio.workspace = true
+sqlx.workspace = true
+serde.workspace = true
+mongodb.workspace = true
+uuid.workspace = true
+thiserror.workspace = true
+validator.workspace = true
+tracing.workspace = true
+bb8 = { workspace = true }
+utoipa-swagger-ui = { workspace = true }
+utoipa-redoc = { workspace = true }
+utoipa-rapidoc = { workspace = true }
+utoipa-scalar = { workspace = true }
+redis.workspace = true
+influxdb2.workspace = true
+serde_json.workspace = true
+utoipa.workspace = true
+anyhow.workspace = true
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html

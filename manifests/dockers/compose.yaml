@@ -1,0 +1,36 @@
+services:
+  db:
+    image: "mongo"
+    ports:
+      - "27017:27017"
+  redis:
+    image: "redis:alpine"
+    ports:
+      - "6379:6379"
+  postgres:
+    image: "postgres"
+    environment:
+      POSTGRES_DB: mydatabase
+      POSTGRES_USER: myuser
+      POSTGRES_PASSWORD: mypassword
+    ports:
+      - "5432:5432"
+  influxdb2:
+    image: influxdb:2
+    ports:
+      - "8086:8086"
+    environment:
+      DOCKER_INFLUXDB_INIT_MODE: setup
+      DOCKER_INFLUXDB_INIT_USERNAME: admin
+      DOCKER_INFLUXDB_INIT_PASSWORD: strongpassword
+      DOCKER_INFLUXDB_INIT_ADMIN_TOKEN: admintoken123
+      DOCKER_INFLUXDB_INIT_ORG: docs
+      DOCKER_INFLUXDB_INIT_BUCKET: home
+#    volumes:
+#      - influxdb2-data:/var/lib/influxdb2
+#      - influxdb2-config:/etc/influxdb2
+volumes:
+  influxdb2-data:
+  influxdb2-config:
+# JetBrains
+# jdbc:postgresql://localhost:5432/mydatabase?user=myuser&password=mypassword

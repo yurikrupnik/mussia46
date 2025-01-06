@@ -1,0 +1,43 @@
+# https://taskfile.dev
+
+version: '3'
+
+vars:
+  GREETING: Hello, World!
+
+tasks:
+  default:
+    cmds:
+      - echo "{{.GREETING}}"
+    silent: true
+  install-deps:
+    deps:
+      - default
+    cmds:
+      - kind create cluster
+      - sleep 20
+      - kubectl apply -f manifests/gitops/flux/
+      - kubectl apply -f manifests/gitops/infra/external-secrets/
+      - kubectl apply -f manifests/gitops/infra/keda/
+      - kubectl apply -f manifests/gitops/infra/monitoring/
+      - kubectl apply -f manifests/gitops/infra/argocd/
+      - kubectl apply -f manifests/gitops/infra/argocd-rollouts/
+      - kubectl apply -f manifests/gitops/infra/argocd-workflows/
+      - kubectl apply -f manifests/gitops/infra/argocd-events/
+      - kubectl apply -f manifests/gitops/infra/cnpg/
+      - kubectl apply -f manifests/gitops/infra/cnpg/
+      #      - kubectl apply  -f manifests/gitops/infra/testkube/
+  #      - kubectl create namespace argocd
+  #      - kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+  #      - testkube pro init --agent-token=tkcagnt_6fb9611ac46fcfdcca95ecc9d05570 --org-id=tkcorg_0b8082b78d25a72f --env-id=tkcenv_c161a3e3d8d82775
+  #      - timoni bundle apply -f manifests/bundle.cue -r manifests/runtime.cue --runtime-from-env
+  #      - kubectl annotate node --all kwasm.sh/kwasm-node=true # Annonate the nodes to support wasm runtime
+  #      - kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.1.0/standard-install.yaml
+  #      - kubectl apply -f manifests/configs/stage.yaml
+  doc:watch:
+    cmds:
+      - cargo doc --workspace --no-deps -r --open
+  #    watch: true
+  shits:
+    cmds:
+      - echo shits

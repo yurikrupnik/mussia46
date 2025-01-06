@@ -1,0 +1,22 @@
+[package]
+name = "models"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+proc_macros.workspace = true
+#services = { workspace = true, features = ["mongo"] }
+#services = { workspace = true}
+ts-rs.workspace = true
+redis.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+validator.workspace = true
+mongodb.workspace = true
+#task added
+#tabled.workspace = true
+sqlx.workspace = true
+utoipa.workspace = true
+clap.workspace = true
+strum.workspace = true
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html

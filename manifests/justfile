@@ -1,0 +1,7 @@
+default:
+    echo "Creating a local cluster for local development."
+
+buf:
+    buf lint
+    buf build
+    buf generate

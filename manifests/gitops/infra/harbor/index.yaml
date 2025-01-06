@@ -1,0 +1,48 @@
+---
+# Instance: harbor
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: harbor
+  namespace: flux-system
+spec:
+  targetNamespace: harbor
+  chart:
+    spec:
+      chart: harbor
+      interval: 60m
+      sourceRef:
+        kind: HelmRepository
+        name: harbor
+      version: 1.16.*
+  interval: 60m
+  install:
+    createNamespace: true
+    crds: Create
+    disableWait: false
+    disableWaitForJobs: false
+    remediation:
+      retries: -1
+  releaseName: harbor
+  test:
+    enable: false
+  timeout: 5m
+  upgrade:
+    crds: CreateReplace
+    disableWait: false
+    disableWaitForJobs: false
+    remediation:
+      retries: -1
+  values:
+    installCRDs: true
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: harbor
+  namespace: flux-system
+spec:
+  interval: 12h
+  provider: generic
+  url: https://helm.goharbor.io
