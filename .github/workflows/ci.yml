@@ -121,4 +121,4 @@ jobs:
           cache-all-crates: true
       - run: bun install --no-cache
       - uses: nrwl/nx-set-shas@v4
-      - run: bun nx affected --target=docker --parallel --max-parallel=3
+#      - run: bun nx affected --target=docker --parallel --max-parallel=3
