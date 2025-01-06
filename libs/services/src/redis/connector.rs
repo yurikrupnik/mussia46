@@ -1,10 +1,10 @@
 use bb8::{Pool, RunError};
 use bb8_redis::RedisConnectionManager;
-use generals::envs::get_env;
+use generals::envs::Env;
 use redis::{ErrorKind, RedisError};
 
 fn get_redis_uri() -> String {
-    get_env("REDIS_URI").unwrap()
+  Env::get_redis().unwrap()
 }
 
 pub async fn connect() -> Result<Pool<RedisConnectionManager>, RedisError> {

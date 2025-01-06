@@ -65,13 +65,6 @@ pub fn prepare_create_query(json_body: &Value) -> (String, Vec<&Value>, String) 
 mod update_tests {
     use super::*;
     use serde_json::json;
-    // #![feature(test)]
-    // extern crate test;
-    // use test::Bencher;
-    // #[bench]
-    // fn bench_add_two(b: &mut Bencher) {
-    //   b.iter(|| add_two(2));
-    // }
     #[test]
     fn test_prepare_update_query_basic() {
         let json_body = json!({

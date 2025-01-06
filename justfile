@@ -39,6 +39,8 @@ _eho:
 kdash:
     kdash
 
+migrate:
+  -sqlx migrate run --database-url=postgres://myuser:mypassword@localhost/mydatabase --source manifests/dbs/migrations/postgres/
 _istio:
     -kind create cluster --config ./scripts/cluster.yaml
     sleep 20
