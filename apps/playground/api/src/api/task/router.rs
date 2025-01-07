@@ -12,7 +12,7 @@ pub fn router() -> Router<AppState> {
       routing::get(get_tasks).delete(drop_tasks).post(create_task),
     )
     .route(
-      &format!("{}/:id", Task::URL),
+      Task::URL_WITH_ID,
       routing::get(get_task).put(update_task).delete(delete_task),
     )
 }

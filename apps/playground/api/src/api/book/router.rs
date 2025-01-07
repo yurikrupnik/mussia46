@@ -8,11 +8,11 @@ use proc_macros::DbResource;
 pub fn router() -> Router<AppState> {
   Router::new()
     .route(
-      Book::URL,
+      "/ai/books",
       routing::get(get_books).delete(drop_books).post(create_book),
     )
-    .route(
-      &format!("{}/:id", Book::URL),
-      routing::put(update_book).get(get_book).delete(delete_book),
-    )
+    // .route(
+    //   &format!("{}/:id", "/api/books"),
+    //   routing::put(update_book).get(get_book).delete(delete_book),
+    // )
 }

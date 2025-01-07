@@ -39,14 +39,19 @@ fn impl_db_resource_macro(ast: DeriveInput) -> TokenStream {
   // get struct identifier
   let ident = &ast.ident;
   let name = ident.to_string().to_lowercase();
+
+  // Compile-time constants
   let url = format!("/{}", name);
   let collection = pluralize(name.as_str(), 2, false);
   let tag = capitalize_first_letter(&collection);
-
+  // let url_with_id = url.clone() + "/{id}";
+  let url_with_id = format!("{}/{{id}}", url);
   // generate implementation
   let gen = quote! {
         impl DbResource for #ident {
             const URL: &'static str = #url;
+            // const URL_WITH_ID: &'static str = #url + "/{id}";
+            const URL_WITH_ID: &'static str = #url_with_id;
             const COLLECTION: &'static str = #collection;
             const TAG: &'static str = #tag;
         }

@@ -10,7 +10,7 @@ pub fn router() -> Router<AppState> {
       routing::get(get_books).post(create_book).delete(drop_books),
     )
     .route(
-      "/sql-book/:id",
+      "/sql-book/{id}",
       routing::get(get_book).put(update_book).delete(delete_book),
     )
 }

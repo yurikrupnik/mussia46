@@ -13,7 +13,7 @@ pub fn router() -> Router<AppState> {
       routing::get(get_todos).delete(drop_todos).post(create_todo),
     )
     .route(
-      &format!("{}/:id", Todo::URL),
+      Todo::URL_WITH_ID,
       routing::put(update_todo).get(get_todo).delete(delete_todo),
     )
 }

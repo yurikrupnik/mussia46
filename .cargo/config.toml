@@ -2,6 +2,7 @@
 target-dir = 'dist/target'
 [env]
 # Scope down tracing, to filter out external lib tracing.
+PORT = "8080"
 RUST_LOG = "info"
 RUST_ENV = "development"
 # DB's - must be set

@@ -8,10 +8,7 @@ use app_state::AppState;
 use axum::response::IntoResponse;
 use axum::routing::get;
 use axum::Extension;
-use shared::app::app;
-// use axum_utils::errors::AppError;
-// use axum_utils::shutdown::shutdown_signal;
-// use envs::config::get_web_url;
+use shared::{app::app, shutdown::shutdown_signal};
 use log::info;
 use services::influx::services::InfluxConfig;
 use services::{

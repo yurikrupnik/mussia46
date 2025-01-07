@@ -1,26 +1,23 @@
 use super::model::{CreateTask, Task, UpdateTask};
 use crate::app_state::AppState;
-// use crate::error::{ApiErrorMessage, ServerError};
 use axum::{
   extract::{Json, Path, State},
   http::StatusCode,
   response::IntoResponse,
 };
-use axum_utils::errors::{ApiErrorMessage, AppError as ServerError};
+use shared::errors::{ApiErrorMessage, AppError as ServerError};
 use tracing::{debug, error, info, instrument, span, warn, Level};
-// use log::{error, info};
 use models::streams::{
   Stream, CREATE, DELETE, PAYLOAD, REDIS_STREAMS, TASKS_STREAM, UPDATE, USERS_STREAM,
 };
 use redis::{AsyncCommands, RedisResult};
-// use serde::__private::de::borrow_cow_bytes;
 use services::postgres::{
   results::{handle_delete_result, handle_drop_result, handle_result},
   service::{create_item, delete_by_id, drop_collection, get_by_id, get_list, update_by_id},
 };
-// use std::any::Any;
 use uuid::Uuid;
 use validator::Validate;
+use generals::envs::Env;
 
 /// Get list of tasks.
 ///
@@ -140,7 +137,7 @@ pub async fn create_task(
   if let Err(error) = body.validate() {
     return (StatusCode::BAD_REQUEST, Json(error)).into_response();
   }
-  let mut conna = app_state.redis.get().await.expect("dam shit");
+  // let mut conna = app_state.redis.get().await.expect("dam shit");
   // Step 3: Get a Redis connection from the pool
   // let mut conn = match app_state.redis.get().await {
   //     Ok(conn) => conn,
@@ -152,54 +149,28 @@ pub async fn create_task(
   //             .into_response();
   //     }
   // };
-  // let redis_client = redis::Client::open("redis://127.0.0.1/").expect("failed to connect redis");
-  // let mut conn = redis_client
-  //     .get_multiplexed_async_connection()
-  //     .await
-  //     .expect("failed here");
+  let redis_client = redis::Client::open(Env::get_redis().unwrap()).expect("failed to connect redis");
+  let mut conn = redis_client
+      .get_multiplexed_async_connection()
+      .await
+      .expect("failed here");
+  let () = conn.publish("task:create", &body).await.unwrap();
 
-  let request_id = Uuid::new_v4().to_string();
+  // let request_id = Uuid::new_v4().to_string();
 
-  let body_as_json = match serde_json::to_string(&body) {
-    Ok(json) => json,
-    Err(e) => {
-      return (
-        StatusCode::INTERNAL_SERVER_ERROR,
-        format!("Failed to serialize body: {}", e),
-      )
-        .into_response();
-    }
-  };
-  let action = "create";
-  let msg_id: String = match conna
-    .xadd("tasks_stream", "*", &[("payload", &body_as_json), ("request_id", &request_id), ("action", &action.to_string())])
-    .await
-  // .map(|e| {
-  //   e.into()
-  // })
-  // .map_err(|e| (StatusCode::INTERNAL_SERVER_ERROR, format!("Failed to XADD message to Redis stream: {}", e)));
-
-  {
-    Ok(id) => id,
-    Err(e) => {
-      return (
-        StatusCode::INTERNAL_SERVER_ERROR,
-        format!("Failed to XADD message to Redis stream: {}", e),
-      )
-        .into_response()
-    }
-  };
-  // let msg_id: String = match redis::cmd("XADD")
-  //   .arg("tasks_stream")
-  //   .arg("MAXLEN")
-  //   .arg("~")
-  //   .arg(1000) // Approximate maximum length to prevent memory bloat
-  //   .arg("*") // Let Redis assign the message ID
-  //   .arg("payload")
-  //   .arg(&body_as_json)
-  //   .arg("request_id")
-  //   .arg(&request_id)
-  //   .query_async(&mut *conna)
+  // let body_as_json = match serde_json::to_string(&body) {
+  //   Ok(json) => json,
+  //   Err(e) => {
+  //     return (
+  //       StatusCode::INTERNAL_SERVER_ERROR,
+  //       format!("Failed to serialize body: {}", e),
+  //     )
+  //       .into_response();
+  //   }
+  // };
+  // let action = "create";
+  // let msg_id: String = match conna
+  //   .xadd("tasks_stream", "*", &[("payload", &body_as_json), ("request_id", &request_id), ("action", &action.to_string())])
   //   .await
   // {
   //   Ok(id) => id,
@@ -208,87 +179,39 @@ pub async fn create_task(
   //       StatusCode::INTERNAL_SERVER_ERROR,
   //       format!("Failed to XADD message to Redis stream: {}", e),
   //     )
-  //       .into_response();
+  //       .into_response()
   //   }
   // };
 
-  info!("Message added to 'todo_stream' with ID: {}", msg_id);
-
-  // Step 6: Block on BRPOP on "response:<request_id>" with a timeout (e.g., 30 seconds)
-  let response_key = format!("response:{}", request_id);
-  let timeout = 30.0; // Timeout in seconds
-  let result: RedisResult<Option<(String, String)>> = conna.brpop(&response_key, timeout).await;
-  match result {
-    Ok(Some((key, value))) => match serde_json::from_str::<Task>(&value) {
-      Ok(task) => (StatusCode::CREATED, Json(task)).into_response(),
-      Err(e) => (
-        StatusCode::INTERNAL_SERVER_ERROR,
-        format!("Failed to deserialize task: {}", e),
-      )
-        .into_response(),
-    },
-    Ok(None) => (
-      StatusCode::GATEWAY_TIMEOUT,
-      "Timed out waiting for task creation response".to_string(),
-    )
-      .into_response(), // Timeout occurred
-    Err(e) => (
-      StatusCode::INTERNAL_SERVER_ERROR,
-      format!("Failed to BRPOP for response: {}", e),
-    )
-      .into_response(),
-  }
-  //   // Handle the result
-  // match result {
-  //   Ok((key, val)) => redis::Response((key, val)),
-  //   Err(e) => {
-  //     println!("error {:?}", e)
-  //   }
-  // }
-  // match result {
-  //     Some((key, value)) => Some((key, value)),
-  //     None => None,
-  // }
-
-  // let response: Option<(String, String)> = match redis::cmd("BRPOP")
-  //     .arg(&response_key)
-  //     .arg(30) // Timeout in seconds
-  //     .query_async(&mut *conna)
-  //     .await
-  // {
-  //     Ok(Some((key, value))) => Some((key, value)),
-  //     Ok(None) => None, // Timeout occurred
-  //     Err(e) => {
-  //         return (
-  //             StatusCode::INTERNAL_SERVER_ERROR,
-  //             format!("Failed to BRPOP for response: {}", e),
-  //         )
-  //             .into_response();
-  //     }
-  // };
+  // info!("Message added to 'todo_stream' with ID: {}", msg_id);
   //
-  // match response {
-  //     Some((_key, value)) => {
-  //         // Deserialize the value to Task
-  //         return match serde_json::from_str::<Task>(&value) {
-  //             Ok(task) => (StatusCode::CREATED, Json(task)).into_response(),
-  //             Err(e) => (
-  //                 StatusCode::INTERNAL_SERVER_ERROR,
-  //                 format!("Failed to deserialize task: {}", e),
-  //             )
-  //                 .into_response(),
-  //         };
-  //     }
-  //
-  //     None => (
-  //         StatusCode::GATEWAY_TIMEOUT,
-  //         "Timed out waiting for task creation response".to_string(),
+  // // Step 6: Block on BRPOP on "response:<request_id>" with a timeout (e.g., 30 seconds)
+  // let response_key = format!("response:{}", request_id);
+  // let timeout = 10.0; // Timeout in seconds
+  // let result: RedisResult<Option<(String, String)>> = conna.brpop(&response_key, timeout).await;
+  // match result {
+  //   Ok(Some((key, value))) => match serde_json::from_str::<Task>(&value) {
+  //     Ok(task) => (StatusCode::CREATED, Json(task)).into_response(),
+  //     Err(e) => (
+  //       StatusCode::INTERNAL_SERVER_ERROR,
+  //       format!("Failed to deserialize task: {}", e),
   //     )
-  //         .into_response(),
+  //       .into_response(),
+  //   },
+  //   Ok(None) => (
+  //     StatusCode::GATEWAY_TIMEOUT,
+  //     "Timed out waiting for task creation response".to_string(),
+  //   )
+  //     .into_response(), // Timeout occurred
+  //   Err(e) => (
+  //     StatusCode::INTERNAL_SERVER_ERROR,
+  //     format!("Failed to BRPOP for response: {}", e),
+  //   )
+  //     .into_response(),
   // }
 
   // redis pubsub
-  // let () = conn.publish("users_topic", &body).await.unwrap();
+  let () = conn.publish("users_topic", &body).await.unwrap();
   // working steam
   // let msg_id: String = match conn.xadd(TASKS_STREAM, "*", &[(CREATE, &body)]).await {
   //     // let msg_id: String = match conn.xadd("tasks_stream", "*", &[("payload", &body)]).await {
@@ -305,7 +228,7 @@ pub async fn create_task(
   // info!("message id: {msg_id}");
   // let result = create_item::<Task, CreateTask>(&app_state.pool, body).await;
   // handle_result(result, StatusCode::CREATED)
-  // (StatusCode::CREATED).into_response()
+  (StatusCode::CREATED).into_response()
 }
 
 /// Drop Task collection.
