@@ -2,9 +2,9 @@ use mongodb::bson::{doc, oid::ObjectId};
 use proc_macros::DbResource;
 use serde::{Deserialize, Serialize};
 use serde_json::json;
-// use services::mongo::{
-//     query_param_processing::QueryParamProcessing, serialize::serialize_option_object_id,
-// };
+use services::mongo::{
+    query_param_processing::QueryParamProcessing, serialize::serialize_option_object_id,
+};
 // use se
 use sqlx::FromRow;
 use ts_rs::TS;
@@ -91,24 +91,24 @@ pub struct BookItemQuery {
     pub projection: Option<String>,
 }
 
-// impl QueryParamProcessing for BookListQuery {
-//     fn get_limit(&self) -> Option<String> {
-//         self.limit.clone()
-//     }
-//
-//     fn clear_limit(&mut self) {
-//         self.limit = None;
-//     }
-//
-//     fn get_projection(&self) -> Option<String> {
-//         self.projection.clone()
-//     }
-//
-//     fn clear_projection(&mut self) {
-//         self.projection = None;
-//     }
-//
-//     fn into_inner(self) -> serde_json::Value {
-//         serde_json::to_value(self).unwrap_or_else(|_| json!({}))
-//     }
-// }
+impl QueryParamProcessing for BookListQuery {
+    fn get_limit(&self) -> Option<String> {
+        self.limit.clone()
+    }
+
+    fn clear_limit(&mut self) {
+        self.limit = None;
+    }
+
+    fn get_projection(&self) -> Option<String> {
+        self.projection.clone()
+    }
+
+    fn clear_projection(&mut self) {
+        self.projection = None;
+    }
+
+    fn into_inner(self) -> serde_json::Value {
+        serde_json::to_value(self).unwrap_or_else(|_| json!({}))
+    }
+}

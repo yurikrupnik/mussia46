@@ -10,12 +10,17 @@ tasks:
     cmds:
       - echo "{{.GREETING}}"
     silent: true
+  compose:up:
+    cmds:
+      - docker compose --file manifests/dockers/compose.yaml up
+  compose:down:
+    cmds:
+      - docker compose --file manifests/dockers/compose.yaml down
   install-deps:
     deps:
       - default
     cmds:
-      - kind create cluster
-      - sleep 20
+      - just cluster
       - kubectl apply -f manifests/gitops/flux/
       - kubectl apply -f manifests/gitops/infra/external-secrets/
       - kubectl apply -f manifests/gitops/infra/keda/

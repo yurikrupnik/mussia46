@@ -19,6 +19,7 @@ unsafe_code = 'forbid'
 [workspace.dependencies]
 proc_macros = { path = 'libs/proc_macros' }
 services = { path = 'libs/services' }
+shared = { path = 'libs/shared' }
 cli = { path = 'libs/cli' }
 models = { path = 'libs/models' }
 generals = { path = 'libs/generals' }

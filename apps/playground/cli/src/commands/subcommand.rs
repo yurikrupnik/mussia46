@@ -319,8 +319,8 @@ pub async fn list(pool: &PgPool) -> Result<(), Errors> {
         .await?;
 
     // todo bring back tabled
-    // let table = Table::new(tasks);
-    // println!("{}", table);
+    let table = Table::new(tasks);
+    println!("{}", table);
     Ok(())
 }
 pub async fn delete_by_id(pool: &PgPool, id: &Uuid) -> Result<(), Errors> {

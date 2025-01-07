@@ -1,33 +1,23 @@
 use clap::Parser;
-// use cli::format_option;
+use cli::format_option;
 use proc_macros::DbResource;
 use redis::{RedisWrite, ToRedisArgs};
-// use redis_derive::{FromRedisValue, ToRedisArgs};
 use serde::{Deserialize, Serialize};
 use sqlx::postgres::PgRow;
 use sqlx::types::Uuid;
 use sqlx::{FromRow, Row};
-// use tabled::Tabled;
+use tabled::Tabled;
 use utoipa::ToSchema;
 use validator::Validate;
 
-#[derive(DbResource, Debug, Deserialize, Serialize, ToSchema)]
-// #[schema(
-//   example = json!(
-//     {
-//       "id": "00000000-0000-0000-0000-000000000000",
-//       "title": "Task title",
-//       "description": "Task description",
-//       "completed": false
-//     }
-//   )
-// )]
+
+#[derive(DbResource, Debug, Deserialize, Serialize, ToSchema, Tabled)]
 pub struct Task {
     #[schema(default = "00000000-0000-0000-0000-000000000000")]
     pub id: Uuid,
     /// Title of the task
     pub title: String,
-    // #[tabled(display_with = "format_option")]
+    #[tabled(display_with = "format_option")]
     /// description of the task
     pub description: Option<String>,
     /// completed state of the task

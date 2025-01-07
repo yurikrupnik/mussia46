@@ -19,8 +19,9 @@ lint:
 #    -kubectl create secret generic secret-puller --from-file=creds=./tmp/secret-puller.json
 #    -kubectl create configmap k6-load-test --from-file=tss.js
 #    -kubectl create secret docker-registry docker-registry-secret --docker-server=me-west1-docker.pkg.dev  --docker-username=_json_key --docker-password="$(cat ./tmp/container-puller.json)" --docker-email=container-puller-sa@devops-386509.iam.gserviceaccount.com
-
-# kubectl apply --filename https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/deploy/static/provider/kind/deploy.yaml
+cluster:
+    -kind create cluster --config ./manifests/cluster/cluster.yaml
+    sleep 20
 _local:
     -kind create cluster --config ./scripts/cluster.yaml
     sleep 20

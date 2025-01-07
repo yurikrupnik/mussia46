@@ -5,16 +5,17 @@ edition = "2021"
 
 [dependencies]
 proc_macros.workspace = true
-#services = { workspace = true, features = ["mongo"] }
-#services = { workspace = true}
-ts-rs.workspace = true
 redis.workspace = true
+cli.workspace = true
+#services = { workspace = true, features = ["mongo"] }
+services = { workspace = true}
+ts-rs.workspace = true
 serde.workspace = true
 serde_json.workspace = true
 validator.workspace = true
 mongodb.workspace = true
 #task added
-#tabled.workspace = true
+tabled.workspace = true
 sqlx.workspace = true
 utoipa.workspace = true
 clap.workspace = true
