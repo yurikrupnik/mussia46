@@ -2890,6 +2890,15 @@ dependencies = [
 [[package]]
 name = "playground_operator"
 version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "http 1.2.0",
+ "k8s-openapi",
+ "kube",
+ "serde",
+ "serde_json",
+ "tokio",
+]
 
 [[package]]
 name = "playground_redis_pubsub"

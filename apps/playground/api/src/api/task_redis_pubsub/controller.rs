@@ -21,12 +21,13 @@ use services::postgres::{
 use uuid::Uuid;
 use validator::Validate;
 
+
 #[utoipa::path(
   get,
   path = "/api/task-redis-pubsub",
   tag = "Tasks Redis PubSub",
   responses(
-(status = 200, description = "Collection found successfully", body = [Task]),
+    (status = 200, description = "Collection found successfully", body = [Task]),
   ),
 )]
 pub async fn get_tasks(State(app_state): State<AppState>) -> impl IntoResponse {
