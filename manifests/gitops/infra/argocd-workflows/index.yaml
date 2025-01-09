@@ -1,39 +1,25 @@
----
-# Instance: argo-cd
----
-apiVersion: helm.toolkit.fluxcd.io/v2
-kind: HelmRelease
+apiVersion: argoproj.io/v1alpha1
+kind: Application
 metadata:
   name: argo-workflows
-  namespace: flux-system
+  namespace: argocd # ArgoCD control namespace
 spec:
-  targetNamespace: argo-workflows
-  chart:
-    spec:
-      chart: argo-workflows
-      interval: 60m
-      sourceRef:
-        kind: HelmRepository
-        name: argo
-      version: 0.45.*
-  interval: 60m
-  install:
-    createNamespace: true
-    crds: Create
-    disableWait: false
-    disableWaitForJobs: false
-    remediation:
-      retries: -1
-  releaseName: argo-workflows
-  test:
-    enable: false
-  timeout: 5m
-  upgrade:
-    crds: CreateReplace
-    disableWait: false
-    disableWaitForJobs: false
-    remediation:
-      retries: -1
-  values:
-    installCRDs: true
-
+  destination:
+    namespace: argo-workflows # Target namespace where resources will be deployed
+    server: https://kubernetes.default.svc # Cluster to deploy to (default cluster)
+  source:
+    repoURL: https://argoproj.github.io/argo-helm # Replace with the actual Helm repository URL
+    chart: argo-workflows
+    targetRevision: 0.45.* # Version of the chart to deploy
+    helm:
+      releaseName: argo-workflows
+      parameters:
+        - name: installCRDs
+          value: "true"
+  project: default # ArgoCD project (use `default` unless you have a specific project setup)
+  syncPolicy:
+    automated: # Optional: Enables automated synchronization
+      prune: true # Allow resources to be pruned if they are removed from the chart
+      selfHeal: true # Automatically sync if drift is detected
+    syncOptions:
+      - CreateNamespace=true # Automatically create the namespace if it doesn't exist

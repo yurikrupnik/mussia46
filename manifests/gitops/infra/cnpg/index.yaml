@@ -1,48 +1,26 @@
----
-# Instance: cloudnative-pg-cd
----
-apiVersion: helm.toolkit.fluxcd.io/v2
-kind: HelmRelease
+
+apiVersion: argoproj.io/v1alpha1
+kind: Application
 metadata:
   name: cloudnative-pg
-  namespace: flux-system
+  namespace: argocd # ArgoCD control namespace
 spec:
-  targetNamespace: cloudnative-pg
-  chart:
-    spec:
-      chart: cloudnative-pg
-      interval: 60m
-      sourceRef:
-        kind: HelmRepository
-        name: cloudnative-pg
-      version: 0.23.*
-  interval: 60m
-  install:
-    createNamespace: true
-    crds: Create
-    disableWait: false
-    disableWaitForJobs: false
-    remediation:
-      retries: -1
-  releaseName: cloudnative-pg
-  test:
-    enable: false
-  timeout: 5m
-  upgrade:
-    crds: CreateReplace
-    disableWait: false
-    disableWaitForJobs: false
-    remediation:
-      retries: -1
-  values:
-    installCRDs: true
----
-apiVersion: source.toolkit.fluxcd.io/v1
-kind: HelmRepository
-metadata:
-  name: cloudnative-pg
-  namespace: flux-system
-spec:
-  interval: 12h
-  provider: generic
-  url: https://cloudnative-pg.io/charts/
+  destination:
+    namespace: cloudnative-pg # Target namespace where resources will be deployed
+    server: https://kubernetes.default.svc # Cluster to deploy to (default cluster)
+  source:
+    repoURL: https://cloudnative-pg.io/charts/ # Replace with the actual Helm repository URL
+    chart: cloudnative-pg
+    targetRevision: 0.27.* # Version of the chart to deploy
+    helm:
+      releaseName: cloudnative-pg
+      parameters:
+        - name: installCRDs
+          value: "true"
+  project: default # ArgoCD project (use `default` unless you have a specific project setup)
+  syncPolicy:
+    automated: # Optional: Enables automated synchronization
+      prune: true # Allow resources to be pruned if they are removed from the chart
+      selfHeal: true # Automatically sync if drift is detected
+    syncOptions:
+      - CreateNamespace=true # Automatically create the namespace if it doesn't exist

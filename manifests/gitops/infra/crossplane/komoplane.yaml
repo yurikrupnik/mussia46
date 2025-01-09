@@ -1,18 +1,18 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: argo-events
+  name: komoplane
   namespace: argocd # ArgoCD control namespace
 spec:
   destination:
-    namespace: argo-events # Target namespace where resources will be deployed
+    namespace: komoplane # Target namespace where resources will be deployed
     server: https://kubernetes.default.svc # Cluster to deploy to (default cluster)
   source:
-    repoURL: https://argoproj.github.io/argo-helm # Replace with the actual Helm repository URL
-    chart: argo-events
-    targetRevision: 2.4.* # Version of the chart to deploy
+    repoURL: https://helm-charts.komodor.io # Replace with the actual Helm repository URL
+    chart: komoplane
+    targetRevision: 0.1.* # Version of the chart to deploy
     helm:
-      releaseName: argo-events
+      releaseName: komoplane
       parameters:
         - name: installCRDs
           value: "true"
