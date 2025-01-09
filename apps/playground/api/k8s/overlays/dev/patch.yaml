@@ -1,0 +1,14 @@
+- op: add
+  path: /spec/template/spec/containers/0/env/-
+  value:
+    name: GREETING
+    value: Hello, World!
+- op: add
+  path: /spec/template/spec/containers/0/env/-
+  valueFrom:
+#    secretKeyRef:
+#      key: GREETING
+#      name: my-secret
+    configMapKeyRef:
+      key: GREETING
+      name: my-config

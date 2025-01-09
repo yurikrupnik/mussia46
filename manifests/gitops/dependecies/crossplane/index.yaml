@@ -1,0 +1,23 @@
+---
+apiVersion: storage.gcp.upbound.io/v1beta1
+kind: Bucket
+metadata:
+#  generateName: crossplane-bucket-
+  name: crossplane-bucketaa
+  labels:
+    docs.crossplane.io/example: provider-gcp
+spec:
+  forProvider:
+    location: US
+  providerConfigRef:
+    name: default-gcp
+---
+apiVersion: s3.aws.upbound.io/v1beta1
+kind: Bucket
+metadata:
+  name: crossplane-buckeatds
+spec:
+  forProvider:
+    region: us-east-2
+  providerConfigRef:
+    name: default-aws

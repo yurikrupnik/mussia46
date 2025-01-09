@@ -3,8 +3,28 @@ name = "playground_cli"
 version = "0.1.0"
 edition = "2021"
 
-
 [dependencies]
+proc_macros.workspace = true
+services.workspace = true
+generals.workspace = true
+models.workspace = true
+clap.workspace = true
+k8s-openapi.workspace = true
+kube.workspace = true
+serde.workspace = true
+uuid.workspace = true
+validator.workspace = true
+serde_json.workspace = true
+futures.workspace = true
+sqlx.workspace = true
+tokio.workspace = true
+tabled.workspace = true
+thiserror.workspace = true
 
+#crossterm = { version = "0.28", features = ["serde"] }
+#indicatif = "0.17"
+#ratatui = { version = "0.29", features = ["all-widgets"] }
+#clap-cargo = "0.14"
+#colored = "2.1"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html

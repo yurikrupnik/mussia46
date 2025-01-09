@@ -1,0 +1,25 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: komoplane
+  namespace: argocd # ArgoCD control namespace
+spec:
+  destination:
+    namespace: komoplane # Target namespace where resources will be deployed
+    server: https://kubernetes.default.svc # Cluster to deploy to (default cluster)
+  source:
+    repoURL: https://helm-charts.komodor.io # Replace with the actual Helm repository URL
+    chart: komoplane
+    targetRevision: 0.1.* # Version of the chart to deploy
+    helm:
+      releaseName: komoplane
+      parameters:
+        - name: installCRDs
+          value: "true"
+  project: default # ArgoCD project (use `default` unless you have a specific project setup)
+  syncPolicy:
+    automated: # Optional: Enables automated synchronization
+      prune: true # Allow resources to be pruned if they are removed from the chart
+      selfHeal: true # Automatically sync if drift is detected
+    syncOptions:
+      - CreateNamespace=true # Automatically create the namespace if it doesn't exist

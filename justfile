@@ -2,10 +2,12 @@
 #import 'manifests/justfile'
 
 default:
-    echo "Creating a local cluster for local development."
-    just _local
-    tilt up
-
+    bun nx run-many -t test --parallel --max-parallel=10
+    bun nx run-many -t lint --parallel --max-parallel=10
+    bun nx run-many -t build --parallel --max-parallel=10
+    #echo "Creating a local cluster for local development."
+#    just _local
+#    tilt up
 #    helm install my-kubeshark kubeshark-helm-charts/kubeshark --version 52.3.69
 #    helm repo add kubeshark-helm-charts https://helm.kubeshark.co/
 
@@ -19,8 +21,9 @@ lint:
 #    -kubectl create secret generic secret-puller --from-file=creds=./tmp/secret-puller.json
 #    -kubectl create configmap k6-load-test --from-file=tss.js
 #    -kubectl create secret docker-registry docker-registry-secret --docker-server=me-west1-docker.pkg.dev  --docker-username=_json_key --docker-password="$(cat ./tmp/container-puller.json)" --docker-email=container-puller-sa@devops-386509.iam.gserviceaccount.com
-
-# kubectl apply --filename https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/deploy/static/provider/kind/deploy.yaml
+cluster:
+    -kind create cluster --config ./manifests/cluster/cluster.yaml
+    sleep 20
 _local:
     -kind create cluster --config ./scripts/cluster.yaml
     sleep 20
@@ -39,6 +42,8 @@ _eho:
 kdash:
     kdash
 
+migrate:
+  -sqlx migrate run --database-url=postgres://myuser:mypassword@localhost/mydatabase --source manifests/dbs/migrations/postgres/
 _istio:
     -kind create cluster --config ./scripts/cluster.yaml
     sleep 20

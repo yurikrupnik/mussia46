@@ -5,6 +5,54 @@ edition = "2021"
 
 
 [dependencies]
+proc_macros = { workspace = true }
+#utils = { workspace = true }
+#envs = { workspace = true }
+services = { workspace = true }
+generals = { workspace = true }
+shared = { workspace = true }
+#axum_utils = { workspace = true }
+models = { workspace = true }
+axum = { workspace = true }
+eyre = { workspace = true }
+axum-extra = { workspace = true }
+tower = { workspace = true }
+#tower-http = { workspace = true }
+#tower-cookies = { workspace = true }
+tokio = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+futures = { workspace = true }
+mongodb = { workspace = true }
+sqlx = { workspace = true }
+redis = { workspace = true }
+bb8-redis = { workspace = true }
+bb8 = { workspace = true }
+utoipa = { workspace = true }
+tracing = { workspace = true }
+log = { workspace = true }
+validator = { workspace = true }
+thiserror = { workspace = true }
+influxdb2.workspace = true
+influxdb2-derive.workspace = true
+num-traits = "0.2"
+influxdb2-structmap = "0.2.0"
+ts-rs = { workspace = true }
+#prometheus = { version = "0.13", features = ["default"] }
+#metrics = { workspace = true }
+#metrics-exporter-prometheus = { workspace = true }
+#axum-prometheus = { version = "0.6", features = ["default"] }
+fake = { version = "3.0.1", features = ["derive", "time", "uuid", "http"] }
+strum = { version = "0.26", features = ["derive"] }
+headers = { workspace = true }
+tokio-stream = { workspace = true }
+reqwest = { version = "0.12", features = ["json"] }
+chrono = { workspace = true }
+uuid = { workspace = true }
+anyhow = "1.0"
+http = "1.2.0"
+strum_macros = "0.26.4"
+
 
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html

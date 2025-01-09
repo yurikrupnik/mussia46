@@ -1,0 +1,23 @@
+[package]
+name = "playground_redis_stream"
+version = "0.1.0"
+edition = "2021"
+
+
+[dependencies]
+#axum.workspace = true
+models.workspace = true
+generals.workspace = true
+serde.workspace = true
+#http.workspace = true
+tokio.workspace = true
+redis.workspace = true
+services.workspace = true
+serde_json.workspace = true
+#futures-executor.workspace = true
+#futures.workspace = true
+uuid.workspace = true
+#tracing.workspace = true
+
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html

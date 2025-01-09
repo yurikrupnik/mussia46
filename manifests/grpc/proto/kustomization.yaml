@@ -1,0 +1,7 @@
+configMapGenerator:
+  - name: proto-configs
+    options:
+      disableNameSuffixHash: true
+    files:
+      - users.proto
+      - tasks.proto

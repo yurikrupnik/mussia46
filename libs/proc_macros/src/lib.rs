@@ -9,6 +9,7 @@ pub trait Reflective {
 
 pub trait DbResource {
   const URL: &'static str;
+  const URL_WITH_ID: &'static str;
   const COLLECTION: &'static str;
   const TAG: &'static str;
   // const SHIT: &'static str;

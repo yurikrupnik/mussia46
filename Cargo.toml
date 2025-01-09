@@ -1,3 +1,4 @@
+
 [workspace]
 resolver = '2'
 members = [
@@ -11,6 +12,9 @@ members = [
 	'apps/playground/api',
 	'apps/playground/cli',
 	'apps/playground/operator',
+	'apps/playground/redis/stream',
+	'apps/playground/redis/pubsub',
+	'apps/playground/redis/request_response',
 ]
 
 [workspace.lints.rust]
@@ -19,6 +23,7 @@ unsafe_code = 'forbid'
 [workspace.dependencies]
 proc_macros = { path = 'libs/proc_macros' }
 services = { path = 'libs/services' }
+shared = { path = 'libs/shared' }
 cli = { path = 'libs/cli' }
 models = { path = 'libs/models' }
 generals = { path = 'libs/generals' }

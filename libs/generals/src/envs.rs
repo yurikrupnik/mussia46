@@ -28,7 +28,7 @@ impl Env {
         Env::get_env("MONGO_URI")
     }
     pub fn get_url() -> String {
-        let port = Env::get_port().unwrap();
+        let port = Env::get_port().expect("PORT is not set");
         format!("{}:{}", Ipv4Addr::UNSPECIFIED, port)
     }
 }

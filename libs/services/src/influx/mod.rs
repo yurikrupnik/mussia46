@@ -1,2 +1,2 @@
-mod connector;
-mod services;
+pub mod connector;
+pub mod services;

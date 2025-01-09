@@ -1,0 +1,25 @@
+[package]
+name = "playground_redis_request_response"
+version = "0.1.0"
+edition = "2021"
+
+
+[dependencies]
+proc_macros.workspace = true
+generals.workspace = true
+shared.workspace = true
+tracing.workspace = true
+#axum_utils.workspace = true
+tokio.workspace = true
+axum.workspace = true
+redis.workspace = true
+models.workspace = true
+services.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+anyhow.workspace = true
+uuid.workspace = true
+sqlx.workspace = true
+
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html

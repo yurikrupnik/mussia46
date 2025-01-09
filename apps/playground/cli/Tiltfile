@@ -1,0 +1,13 @@
+
+
+docker_build(
+  "yurikrupnik/playground-cli",
+  "../../..",
+  dockerfile="../../../manifests/dickers/rust-prod.Dockerfile",
+  build_args={"APP_NAME":"playground_cli"},
+  target="final",
+  ignore=["k8s", "../../../manifests", "../../../platform"],
+)
+k8s_resource("web-playground", port_forwards="5201:8080")
+#k8s_yaml(kustomize('manifests/kustomize/overlays/dev'))
+#k8s_resource("web-playground", port_forwards="5201:8080")

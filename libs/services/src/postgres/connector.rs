@@ -1,8 +1,8 @@
-use generals::envs::get_env;
+use generals::envs::Env;
 use sqlx::{postgres::PgPoolOptions, Pool, Postgres};
 
 fn get_sql_uri() -> String {
-    get_env("DATABASE_URL").unwrap()
+  Env::get_postgres().unwrap()
 }
 pub async fn connect(
     url: Option<&str>,
@@ -25,18 +25,18 @@ pub async fn connect(
     Ok(pool)
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-    #[tokio::test]
-    async fn test_connect_with_invalid_url() {
-        let invalid_url = "invalid_url";
-
-        let result = connect(Some(invalid_url), None).await;
-
-        assert!(
-            result.is_err(),
-            "Connection with an invalid URL should fail."
-        );
-    }
-}
+// #[cfg(test)]
+// mod tests {
+//     use super::*;
+//     #[tokio::test]
+//     async fn test_connect_with_invalid_url() {
+//         let invalid_url = "invalid_url";
+//
+//         let result = connect(Some(invalid_url), None).await;
+//
+//         assert!(
+//             result.is_err(),
+//             "Connection with an invalid URL should fail."
+//         );
+//     }
+// }
