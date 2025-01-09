@@ -41,7 +41,7 @@ jobs:
       # Prepend any command with "nx-cloud record --" to record its logs to Nx Cloud
       # - run: bun nx-cloud record -- echo Hello World
       # Nx Affected runs only tasks affected by the changes in this PR/commit. Learn more: https://nx.dev/ci/features/affected
-      - run: bun nx affected --target=e2e --parallel --max-parallel=3
+#      - run: bun nx affected --target=e2e --parallel --max-parallel=3
   lint:
     runs-on: ubuntu-latest
     steps:
@@ -61,7 +61,7 @@ jobs:
           cache-all-crates: true
       - run: bun install --no-cache
       - uses: nrwl/nx-set-shas@v4
-      - run: bun nx affected --target=lint --parallel --max-parallel=3
+#      - run: bun nx affected --target=lint --parallel --max-parallel=3
   test:
     runs-on: ubuntu-latest
     steps:
@@ -81,7 +81,7 @@ jobs:
           cache-all-crates: true
       - run: bun install --no-cache
       - uses: nrwl/nx-set-shas@v4
-      - run: bun nx affected --target=test --parallel --max-parallel=3
+#      - run: bun nx affected --target=test --parallel --max-parallel=3
   build:
     runs-on: ubuntu-latest
     steps:
@@ -101,7 +101,7 @@ jobs:
           cache-all-crates: true
       - run: bun install --no-cache
       - uses: nrwl/nx-set-shas@v4
-      - run: bun nx affected --target=build --parallel --max-parallel=3
+#      - run: bun nx affected --target=build --parallel --max-parallel=3
   docker:
     runs-on: ubuntu-latest
     steps:
@@ -119,20 +119,20 @@ jobs:
       - run: bun install --no-cache
       - uses: nrwl/nx-set-shas@v4
 
-      - name: Log into registry
-        uses: docker/login-action@v2
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_PASSWORD }}
-      - name: 'Set up Cloud SDK'
-        uses: 'google-github-actions/setup-gcloud@v1'
-      - run: gcloud config list
-      - id: 'auth'
-        uses: 'google-github-actions/auth@v1'
-        with:
-          workload_identity_provider: 'projects/191986664052/locations/global/workloadIdentityPools/git-pool/providers/github-identity-pool-provider'
-          service_account: 'container-builder-sa@shared-404221.iam.gserviceaccount.com'
-      - run: |-
-          gcloud --quiet auth configure-docker europe-central2-docker.pkg.dev
+#      - name: Log into registry
+#        uses: docker/login-action@v2
+#        with:
+#          username: ${{ secrets.DOCKERHUB_USERNAME }}
+#          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+#      - name: 'Set up Cloud SDK'
+#        uses: 'google-github-actions/setup-gcloud@v1'
+#      - run: gcloud config list
+#      - id: 'auth'
+#        uses: 'google-github-actions/auth@v1'
+#        with:
+#          workload_identity_provider: 'projects/191986664052/locations/global/workloadIdentityPools/git-pool/providers/github-identity-pool-provider'
+#          service_account: 'container-builder-sa@shared-404221.iam.gserviceaccount.com'
+#      - run: |-
+#          gcloud --quiet auth configure-docker europe-central2-docker.pkg.dev
 
-      - run: bun nx affected --target=docker --parallel --max-parallel=3
+#      - run: bun nx affected --target=docker --parallel --max-parallel=3

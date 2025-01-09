@@ -2,10 +2,12 @@
 #import 'manifests/justfile'
 
 default:
-    echo "Creating a local cluster for local development."
-    just _local
-    tilt up
-
+    bun nx run-many -t test --parallel --max-parallel=10
+    bun nx run-many -t lint --parallel --max-parallel=10
+    bun nx run-many -t build --parallel --max-parallel=10
+    #echo "Creating a local cluster for local development."
+#    just _local
+#    tilt up
 #    helm install my-kubeshark kubeshark-helm-charts/kubeshark --version 52.3.69
 #    helm repo add kubeshark-helm-charts https://helm.kubeshark.co/
 
