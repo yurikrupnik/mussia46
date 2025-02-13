@@ -1,5 +1,3 @@
-
-
 docker_build(
   "yurikrupnik/playground-cli",
   "../../..",
@@ -8,6 +6,7 @@ docker_build(
   target="final",
   ignore=["k8s", "../../../manifests", "../../../platform"],
 )
+
 k8s_resource("web-playground", port_forwards="5201:8080")
 #k8s_yaml(kustomize('manifests/kustomize/overlays/dev'))
 #k8s_resource("web-playground", port_forwards="5201:8080")

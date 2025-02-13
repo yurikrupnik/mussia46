@@ -1,0 +1,27 @@
+apiVersion: yurikrupnik.com/v1alpha1
+kind: Storage
+metadata:
+  name: my-storage
+  namespace: default
+spec:
+  id: my-storage
+  compositionSelector:
+    matchLabels:
+      provider: gcp
+  parameters:
+    location: us-west1
+    name: my-bucket
+---
+apiVersion: yurikrupnik.com/v1alpha1
+kind: Storage
+metadata:
+  name: my-storage
+  namespace: default
+spec:
+  id: my-storage
+  compositionSelector:
+    matchLabels:
+      provider: aws
+  parameters:
+    location: us-west-1
+    name: my-bucket

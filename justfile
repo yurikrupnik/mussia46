@@ -36,11 +36,23 @@ _local:
 #    timoni bundle build -f manifests/bundle.cue -r manifests/runtime.cue --runtime-from-env
 
 # kubectl annotate node --all kwasm.sh/kwasm-node=true # Annonate the nodes to support wasm runtime
-_eho:
+_echo:
     echo hello
 
-kdash:
+kdash: # check from here - https://itnext.io/essential-cli-tui-tools-for-developers-7e78f0cd27db
     kdash
+    ktop
+    ctop
+    lazydocker
+    dive
+    ATAC
+    vegeta
+    dog
+    asciinema
+
+run-func:
+  crossplane render xr.yaml composition.yaml functions.yaml | crossplane validate schemaDir -
+  crossplane validate xr.yaml composition.yaml functions.yaml
 
 migrate:
   -sqlx migrate run --database-url=postgres://myuser:mypassword@localhost/mydatabase --source manifests/dbs/migrations/postgres/
@@ -80,3 +92,6 @@ frame:
 bacon:
     bacon clippy
     bacon test
+secrets:
+  echo 'foo: ref+gcpsecrets://playground-447016/github-secret' | vals eval -f -
+# see https://www.kcl-lang.io/docs/user_docs/guides/secret-management/vault for more examples with deployment - do not understand why add secret to annotation

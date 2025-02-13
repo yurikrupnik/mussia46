@@ -1,0 +1,307 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: CompositeResourceDefinition
+metadata:
+  annotations:
+    app.kubernetes.io/owner: Yuri Krupnik (krupnik.yuri@gmail.com)
+  labels:
+    team: platform
+    app.kubernetes.io/part-of: iac
+  name: storages.yurikrupnik.com
+spec:
+  claimNames:
+    kind: StorageClaim
+    plural: storagesclaims
+  defaultCompositeDeletePolicy: Background
+  defaultCompositionRef:
+    name: gcp-storage
+  defaultCompositionUpdatePolicy: Automatic
+  group: yurikrupnik.com
+  names:
+    kind: Storage
+    plural: storages
+  versions:
+  - additionalPrinterColumns:
+    - jsonPath: '.status.url'
+      name: url
+      type: string
+    - jsonPath: '.status.id'
+      name: id
+      type: string
+    - jsonPath: '.status.cloud-url'
+      name: cloud-url
+      type: string
+    name: v1alpha1
+    referenceable: true
+    schema:
+      openAPIV3Schema:
+        type: object
+        properties:
+          spec:
+            type: object
+            required:
+            - id
+            - parameters
+            properties:
+              id:
+                type: string
+                description: ID of the resource that other objects will use to refer to it.
+              parameters:
+                type: object
+                required:
+                - location
+                properties:
+                  location:
+                    type: string
+                    description: Location where the bucket should be created.
+                    examples:
+                    - europe-west1 (GCP)
+                    - eu-west-1 (AWS)
+                  description:
+                    type: string
+                    description: Description of the network in the cloud
+                  production:
+                    type: boolean
+                    description: Choose to create production config
+                    default: false
+                  subnetworks:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        name:
+                          type: string
+                        region:
+                          type: string
+                        cidrRange:
+                          type: string
+                        description:
+                          type: string
+          status:
+            type: object
+            properties:
+              url:
+                type: string
+              id:
+                type: string
+              cloud-url:
+                type: string
+    served: true
+---
+apiVersion: apiextensions.crossplane.io/v1
+kind: Composition
+metadata:
+  labels:
+    provider: aws
+  name: aws-storage
+spec:
+  compositeTypeRef:
+    apiVersion: yurikrupnik.com/v1alpha1
+    kind: Storage
+  mode: Pipeline
+  pipeline:
+  - functionRef:
+      name: function-patch-and-transform
+    input:
+      apiVersion: pt.fn.crossplane.io/v1beta1
+      kind: Resources
+      resources:
+      - name: aws-bucket
+        base:
+          apiVersion: s3.aws.upbound.io/v1beta1
+          kind: Bucket
+          spec:
+            deletionPolicy: Delete
+            forProvider:
+              forceDestroy: true
+              region: eu-west-1
+            managementPolicies:
+            - '*'
+        patches:
+        - fromFieldPath: spec.parameters.location
+          toFieldPath: spec.forProvider.region
+        - type: ToCompositeFieldPath
+          fromFieldPath: status.atProvider.id
+          toFieldPath: status.id
+        - type: ToCompositeFieldPath
+          fromFieldPath: status.atProvider.bucketRegionalDomainName
+          toFieldPath: status.url
+          transforms:
+          - string:
+              fmt: https://%s
+              type: Format
+            type: string
+        - type: ToCompositeFieldPath
+          fromFieldPath: status.atProvider.id
+          toFieldPath: status.cloud-url
+          transforms:
+          - string:
+              fmt: s3://%s
+              type: Format
+            type: string
+    step: patch-and-transform
+  - functionRef:
+      name: function-auto-ready
+    step: automatically-detect-ready-composed-resources
+  writeConnectionSecretsToNamespace: crossplane-system
+---
+apiVersion: apiextensions.crossplane.io/v1
+kind: Composition
+metadata:
+  labels:
+    provider: gcp
+  name: gcp-storage
+spec:
+  compositeTypeRef:
+    apiVersion: yurikrupnik.com/v1alpha1
+    kind: Storage
+  mode: Pipeline
+  pipeline:
+  - functionRef:
+      name: function-patch-and-transform
+    input:
+      apiVersion: pt.fn.crossplane.io/v1beta1
+      kind: Resources
+      resources:
+      - name: gcp-bucket
+        base:
+          apiVersion: storage.gcp.upbound.io/v1beta1
+          kind: Bucket
+          spec:
+            deletionPolicy: Delete
+            forProvider:
+              location: europe-west1
+              storageClass: STANDARD
+              uniformBucketLevelAccess: true
+            managementPolicies:
+            - '*'
+        patches:
+        - fromFieldPath: spec.parameters.location
+          toFieldPath: spec.forProvider.location
+        - type: ToCompositeFieldPath
+          fromFieldPath: status.atProvider.id
+          toFieldPath: status.id
+        - type: ToCompositeFieldPath
+          fromFieldPath: status.atProvider.selfLink
+          toFieldPath: status.url
+        - type: ToCompositeFieldPath
+          fromFieldPath: status.atProvider.url
+          toFieldPath: status.cloud-url
+    step: patch-and-transform
+  - functionRef:
+      name: kcl-function
+    input:
+      apiVersion: krm.kcl.dev/v1alpha1
+      kind: KCLInput
+      metadata:
+        name: basic
+      spec:
+        source: |2
+
+          oxr = option("params").oxr
+          ocds = option("params").ocds
+          _metadata = lambda suffix: str, kind: str -> any {
+              {
+                  if suffix == "":
+                      name = oxr.spec.id
+                  else:
+                      name = oxr.spec.id + "-" + suffix
+                  annotations = {
+                      "krm.kcl.dev/composition-resource-name" = oxr.spec.id + "-" + kind + "-" + suffix
+                  }
+              }
+          }
+          network = {
+            apiVersion = "compute.gcp.upbound.io/v1beta1"
+            kind: "Network"
+            metadata = _metadata("", "omg")
+            spec.forProvider = {
+              autoCreateSubnetworks = False
+              routingMode = "REGIONAL"
+              description = oxr.spec.parameters.description
+            }
+          }
+          subnetworks = [
+            {
+              apiVersion = "compute.gcp.upbound.io/v1beta1"
+              kind = "Subnetwork"
+              metadata = _metadata(subnetwork.name, "omg")
+              spec.forProvider = {
+                region = subnetwork.region
+                ipCidrRange = subnetwork.cidrRange
+                description = subnetwork.description
+                privateIpGoogleAccess = True
+                networkSelector.matchControllerRef = True
+              }
+            } for subnetwork in oxr.spec.parameters.subnetworks
+          ]
+
+          customNetwork = {
+            apiVersion = "compute.gcp.upbound.io/v1beta1"
+            kind = "Subnetwork"
+            metadata = _metadata("my-network", "omg")
+            spec.forProvider = {
+              region = "us-west2"
+              ipCidrRange = "10.148.0.0/20"
+              description = "some shit desc"
+              privateIpGoogleAccess = True
+              network = "crossplane-ares"
+            }
+          }
+
+          customNetwork1 = {
+            apiVersion = "compute.gcp.upbound.io/v1beta1"
+            kind = "Subnetwork"
+            metadata = _metadata("my-network1", "omg")
+            spec.forProvider = {
+              region = "us-west2"
+              ipCidrRange = "10.128.0.0/20"
+              description = "some shit desc"
+              privateIpGoogleAccess = True
+              networkRef.name = "crossplane-ares"
+            }
+          }
+
+          redis = {
+            apiVersion = "redis.gcp.upbound.io/v1beta1"
+            kind = "Instance"
+            metadata = _metadata("redis", "omg")
+            spec.forProvider = {
+              tier = "STANDARD_HA" if oxr.spec.parameters.production else "BASIC"
+              memorySizeGb = 3
+              authorizedNetwork = "crossplane-ares"
+              locationId = "us-west2-a"
+              redisVersion = "REDIS_7_0"
+              region = oxr.spec.parameters.subnetworks[0].region
+              labels.environment = "prod" if oxr.spec.parameters.production else "dev"
+              authEnabled = True if oxr.spec.parameters.production else False
+              replicaCount = 1 if oxr.spec.parameters.production else 0
+              connectMode = "PRIVATE_SERVICE_ACCESS" if oxr.spec.parameters.production else "DIRECT_PEERING"
+              persistenceConfig = {
+                persistenceMode = "RDB"
+                rdbSnapshotPeriod = "ONE_HOUR"
+              } if oxr.spec.parameters.production else { persistenceMode = "DISABLED" }
+              readReplicasMode = "READ_REPLICAS_ENABLED" if oxr.spec.parameters.production else "READ_REPLICAS_DISABLED"
+            }
+            spec.writeConnectionSecretToRef = {
+              name = "example-redis-instance-secret"
+              namespace = "crossplane-system"
+            }
+          }
+
+          dxr = {
+              **option("params").dxr
+          }
+
+          items = [
+            network
+            customNetwork
+            customNetwork1
+            *subnetworks
+            redis
+            dxr
+          ]
+    step: normal1
+  - functionRef:
+      name: function-auto-ready
+    step: automatically-detect-ready-composed-resources
+  writeConnectionSecretsToNamespace: crossplane-system

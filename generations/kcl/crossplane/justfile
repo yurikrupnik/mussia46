@@ -1,0 +1,13 @@
+init:
+  up project init my-demo
+  cd my-demo
+  up dependency add "xpkg.upbound.io/upbound/provider-gcp-storage:v1"
+  up dependency add "xpkg.upbound.io/upbound/provider-aws-s3:v1"
+  up dependency add "xpkg.upbound.io/crossplane-contrib/function-auto-ready:v0.4.1"
+  up dependency add "xpkg.upbound.io/crossplane-contrib/function-patch-and-transform:v0.8.1"
+  up example generate --name my-storage --namespace default --type xrc --kind STORAGE --api-group yurikrupnik.com --api-version v1alpha1
+  up xrd generate examples/storage/my-storage.yaml
+  up composition generate apis/xstorages/definition.yaml --path apis/xstorages/gcp.yaml
+  up composition generate apis/xstorages/definition.yaml --path apis/xstorages/aws.yaml
+  up function generate gcp apis/apis/xstorages/aws.yaml
+  up project build

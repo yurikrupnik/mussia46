@@ -10,14 +10,13 @@ use tabled::Tabled;
 use utoipa::ToSchema;
 use validator::Validate;
 
-
 #[derive(DbResource, Debug, Deserialize, Serialize, ToSchema, Tabled)]
 pub struct Task {
     #[schema(default = "00000000-0000-0000-0000-000000000000")]
     pub id: Uuid,
     /// Title of the task
     pub title: String,
-    #[tabled(display_with = "format_option")]
+    #[tabled(display = "format_option")]
     /// description of the task
     pub description: Option<String>,
     /// completed state of the task

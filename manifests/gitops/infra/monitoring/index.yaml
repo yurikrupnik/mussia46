@@ -17,6 +17,8 @@ spec:
       parameters:
         - name: installCRDs
           value: "true"
+        - name: "crds.enabled"
+          value: "true"
   project: default # ArgoCD project (use `default` unless you have a specific project setup)
   syncPolicy:
     automated: # Optional: Enables automated synchronization
@@ -24,3 +26,8 @@ spec:
       selfHeal: true # Automatically sync if drift is detected
     syncOptions:
       - CreateNamespace=true # Automatically create the namespace if it doesn't exist
+      - PruneLast=true
+      - ApplyOutOfSyncOnly=true
+      - RespectIgnoreDifferences=true
+---
+

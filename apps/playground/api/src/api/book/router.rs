@@ -6,10 +6,9 @@ use proc_macros::DbResource;
 
 /// Book router - includes full CRUD
 pub fn router() -> Router<AppState> {
-  Router::new()
-    .route(
-      "/ai/books",
-      routing::get(get_books).delete(drop_books).post(create_book),
+    Router::new().route(
+        "/ai/books",
+        routing::get(get_books).delete(drop_books).post(create_book),
     )
     // .route(
     //   &format!("{}/:id", "/api/books"),

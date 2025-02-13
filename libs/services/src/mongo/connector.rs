@@ -3,7 +3,7 @@ use generals::envs::Env;
 use mongodb::{error::Error, Database};
 
 fn get_mongo_url() -> String {
-  Env::get_mongo().expect("MONGO_URI must be set")
+    Env::get_mongo().expect("MONGO_URI must be set")
 }
 
 pub async fn connect(database: &str) -> Result<Database, Error> {

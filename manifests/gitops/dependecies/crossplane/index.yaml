@@ -9,8 +9,8 @@ metadata:
 spec:
   forProvider:
     location: US
-  providerConfigRef:
-    name: default-gcp
+#  providerConfigRef:
+#    name: default-gcp
 ---
 apiVersion: s3.aws.upbound.io/v1beta1
 kind: Bucket
@@ -19,5 +19,5 @@ metadata:
 spec:
   forProvider:
     region: us-east-2
-  providerConfigRef:
-    name: default-aws
+#  providerConfigRef:
+#    name: default-aws

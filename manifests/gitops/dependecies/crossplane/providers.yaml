@@ -11,3 +11,66 @@ metadata:
   name: provider-aws-s3
 spec:
   package: xpkg.upbound.io/upbound/provider-aws-s3:v1.17.0
+---
+apiVersion: pkg.crossplane.io/v1
+kind: Provider
+metadata:
+  name: provider-aws-ecr
+spec:
+  package: xpkg.upbound.io/upbound/provider-aws-ecr:v1
+---
+apiVersion: pkg.crossplane.io/v1
+kind: Provider
+metadata:
+  name: provider-gcp-artifact
+spec:
+  package: xpkg.upbound.io/upbound/provider-gcp-artifact:v1
+---
+apiVersion: pkg.crossplane.io/v1
+kind: Provider
+metadata:
+  name: provider-aws-ec2
+spec:
+  package: xpkg.upbound.io/upbound/provider-aws-ec2:v1
+---
+apiVersion: pkg.crossplane.io/v1
+kind: Provider
+metadata:
+  name: provider-gcp-compute
+spec:
+  package: xpkg.upbound.io/upbound/provider-gcp-compute:v1
+---
+apiVersion: pkg.crossplane.io/v1
+kind: Provider
+metadata:
+  name: provider-gcp-redis
+spec:
+  package: xpkg.upbound.io/upbound/provider-gcp-redis:v1
+---
+apiVersion: pkg.crossplane.io/v1beta1
+kind: Function
+metadata:
+  name: kcl-function
+spec:
+  package: xpkg.upbound.io/crossplane-contrib/function-kcl:latest
+---
+apiVersion: pkg.crossplane.io/v1beta1
+kind: Function
+metadata:
+  name: function-auto-ready
+spec:
+  package: xpkg.upbound.io/crossplane-contrib/function-auto-ready:v0.4.1
+---
+apiVersion: pkg.crossplane.io/v1beta1
+kind: Function
+metadata:
+  name: function-patch-and-transform
+spec:
+  package: xpkg.upbound.io/crossplane-contrib/function-patch-and-transform:v0.8.1
+---
+apiVersion: pkg.crossplane.io/v1beta1
+kind: Function
+metadata:
+  name: function-cue
+spec:
+  package: xpkg.upbound.io/crossplane-contrib/function-cue:v0.4.0

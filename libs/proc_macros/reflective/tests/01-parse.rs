@@ -2,32 +2,32 @@ use proc_macros::Reflective;
 
 #[derive(Reflective)]
 pub struct Command {
-  executable: String,
-  // args: Vec<String>,
-  // env: Vec<String>,
-  current_dir: String,
+    executable: String,
+    // args: Vec<String>,
+    // env: Vec<String>,
+    current_dir: String,
 }
 
 #[derive(Reflective)]
 pub struct User {
-  id: String,
-  email: String,
-  password: String,
-  // admin: bool,
+    id: String,
+    email: String,
+    password: String,
+    // admin: bool,
 }
 
 fn main() {
-  let keys = Command::field_names();
-  assert_eq!(keys, vec!["executable", "current_dir"]);
+    let keys = Command::field_names();
+    assert_eq!(keys, vec!["executable", "current_dir"]);
 
-  let name = Command::name();
-  assert_eq!(name, "Command");
+    let name = Command::name();
+    assert_eq!(name, "Command");
 
-  let keys = User::field_names();
-  assert_eq!(keys, vec!["id", "email", "password"]);
-  // changed the order of the fields, not equal to the order of the struct
-  assert_ne!(keys, vec!["email", "id", "password"]);
+    let keys = User::field_names();
+    assert_eq!(keys, vec!["id", "email", "password"]);
+    // changed the order of the fields, not equal to the order of the struct
+    assert_ne!(keys, vec!["email", "id", "password"]);
 
-  let name = User::name();
-  assert_eq!(name, "User");
+    let name = User::name();
+    assert_eq!(name, "User");
 }

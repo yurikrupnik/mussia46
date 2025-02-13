@@ -10,12 +10,34 @@ spec:
   source:
     repoURL: https://charts.crossplane.io/stable # Replace with the actual Helm repository URL
     chart: crossplane
-    targetRevision: 1.15.* # Version of the chart to deploy
+    targetRevision: 1.18.* # Version of the chart to deploy
     helm:
       releaseName: crossplane
+      values:
+#        metrics:
+#          enabled: true
+#        provider:
+#          packages:
+#            - name: provider-gcp-storage
+#              version: v1
+#            - name: provider-aws-s3
+#              version: v1
+#        function:
+#          packages:
+#            - name: crossplane-contrib/function-auto-ready
+#              version: v0.4.1
+#            - name: crossplane-contrib/function-patch-and-transform
+#              version: v0.8.1
+#        providerConfig:
+#          gcp:
+#            name: default
+#          aws:
+#            name: default
       parameters:
         - name: installCRDs
           value: "true"
+#        - name: metrics.enabled
+#          value: "true"
   project: default # ArgoCD project (use `default` unless you have a specific project setup)
   syncPolicy:
     automated: # Optional: Enables automated synchronization

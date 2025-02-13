@@ -10,19 +10,19 @@ pub type Result<T> = core::result::Result<T, Errors>;
 
 #[tokio::main]
 async fn main() -> Result<()> {
-  init_tracing();
-  parse_subcommand().await?;
-  Ok(())
+    init_tracing();
+    parse_subcommand().await?;
+    Ok(())
 }
 
 #[cfg(test)]
 mod test {
-  use super::*;
-  use clap::CommandFactory;
-  use commands::subcommand::Args;
+    use super::*;
+    use clap::CommandFactory;
+    use commands::subcommand::Args;
 
-  #[test]
-  fn verify_cli() {
-    Args::command().debug_assert();
-  }
+    #[test]
+    fn verify_cli() {
+        Args::command().debug_assert();
+    }
 }

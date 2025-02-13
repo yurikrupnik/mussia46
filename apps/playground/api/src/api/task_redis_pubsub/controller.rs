@@ -1,26 +1,25 @@
 use super::model::{CreateTask, Task, UpdateTask};
 use crate::app_state::AppState;
 use axum::{
-  extract::{Json, Path, State},
-  http::StatusCode,
-  response::IntoResponse,
+    extract::{Json, Path, State},
+    http::StatusCode,
+    response::IntoResponse,
 };
-use shared::errors::{ApiErrorMessage, AppError as ServerError, AppError};
 use bb8::{PooledConnection, RunError};
 use bb8_redis::RedisConnectionManager;
-use tracing::{debug, error, info, instrument, span, warn, Level};
 use models::streams::{
-  Stream, CREATE, DELETE, PAYLOAD, REDIS_STREAMS, TASKS_STREAM, UPDATE, USERS_STREAM,
+    Stream, CREATE, DELETE, PAYLOAD, REDIS_STREAMS, TASKS_STREAM, UPDATE, USERS_STREAM,
 };
 use redis::{AsyncCommands, RedisError, RedisResult};
-use sqlx::encode::IsNull::No;
 use services::postgres::{
-  results::{handle_delete_result, handle_drop_result, handle_result},
-  service::{create_item, delete_by_id, drop_collection, get_by_id, get_list, update_by_id},
+    results::{handle_delete_result, handle_drop_result, handle_result},
+    service::{create_item, delete_by_id, drop_collection, get_by_id, get_list, update_by_id},
 };
+use shared::errors::{ApiErrorMessage, AppError as ServerError, AppError};
+use sqlx::encode::IsNull::No;
+use tracing::{debug, error, info, instrument, span, warn, Level};
 use uuid::Uuid;
 use validator::Validate;
-
 
 #[utoipa::path(
   get,
@@ -31,8 +30,8 @@ use validator::Validate;
   ),
 )]
 pub async fn get_tasks(State(app_state): State<AppState>) -> impl IntoResponse {
-  let result = get_list::<Task>(&app_state.pool, &None).await;
-  handle_result(result, StatusCode::OK)
+    let result = get_list::<Task>(&app_state.pool, &None).await;
+    handle_result(result, StatusCode::OK)
 }
 
 /// Get Task by id.
@@ -50,18 +49,18 @@ pub async fn get_tasks(State(app_state): State<AppState>) -> impl IntoResponse {
   )
 )]
 pub async fn get_task(
-  Path(id): Path<String>,
-  State(app_state): State<AppState>,
+    Path(id): Path<String>,
+    State(app_state): State<AppState>,
 ) -> impl IntoResponse {
-  // Parse the id as a UUID
-  let item_id = match Uuid::parse_str(&id) {
-    Ok(id) => id,
-    Err(_) => return (StatusCode::BAD_REQUEST, "Invalid UUID format").into_response(),
-  };
-  // fetch the item from the database
-  let result = get_by_id::<Task>(&app_state.pool, &item_id).await;
-  // return the result of the query
-  handle_result(result, StatusCode::OK)
+    // Parse the id as a UUID
+    let item_id = match Uuid::parse_str(&id) {
+        Ok(id) => id,
+        Err(_) => return (StatusCode::BAD_REQUEST, "Invalid UUID format").into_response(),
+    };
+    // fetch the item from the database
+    let result = get_by_id::<Task>(&app_state.pool, &item_id).await;
+    // return the result of the query
+    handle_result(result, StatusCode::OK)
 }
 
 /// Delete Task by given path variable id.
@@ -91,12 +90,12 @@ pub async fn get_task(
   )
 )]
 pub async fn delete_task(
-  Path(id): Path<String>,
-  app_state: State<AppState>,
+    Path(id): Path<String>,
+    app_state: State<AppState>,
 ) -> Result<StatusCode, AppError> {
-  let mut conn = app_state.redis.get().await?;
-  let () = conn.publish("task:delete", &id).await?;
-  Ok(StatusCode::OK)
+    let mut conn = app_state.redis.get().await?;
+    let () = conn.publish("task:delete", &id).await?;
+    Ok(StatusCode::OK)
 }
 
 #[utoipa::path(
@@ -109,16 +108,16 @@ responses(
 )
 )]
 pub async fn create_task_redis(
-  app_state: State<AppState>,
-  Json(body): Json<CreateTask>,
+    app_state: State<AppState>,
+    Json(body): Json<CreateTask>,
 ) -> Result<StatusCode, AppError> {
-  body.validate()?;
-  let mut conn = app_state.redis.get().await?;
+    body.validate()?;
+    let mut conn = app_state.redis.get().await?;
 
-  // redis pubsub
-  let () = conn.publish("task:create", &body).await?;
+    // redis pubsub
+    let () = conn.publish("task:create", &body).await?;
 
-  Ok(StatusCode::CREATED)
+    Ok(StatusCode::CREATED)
 }
 
 /// Drop Task collection via pubsub.
@@ -134,11 +133,11 @@ pub async fn create_task_redis(
   ),
 )]
 pub async fn drop_tasks(app_state: State<AppState>) -> Result<StatusCode, AppError> {
-  let mut conn = app_state.redis.get().await?;
-  // redis pubsub
-  let () = conn.publish("task:drop", "".to_string()).await?;
+    let mut conn = app_state.redis.get().await?;
+    // redis pubsub
+    let () = conn.publish("task:drop", "".to_string()).await?;
 
-  Ok(StatusCode::OK)
+    Ok(StatusCode::OK)
 }
 
 /// Update Task with given id.
@@ -209,24 +208,24 @@ security(
 )
 )]
 pub async fn update_task(
-  app_state: State<AppState>,
-  Path(id): Path<String>,
-  Json(body): Json<UpdateTask>,
+    app_state: State<AppState>,
+    Path(id): Path<String>,
+    Json(body): Json<UpdateTask>,
 ) -> Result<StatusCode, AppError> {
-  // Validate
-  body.validate()?;
-  // establish redis connection
-  let mut conn = app_state.redis.get().await?;
+    // Validate
+    body.validate()?;
+    // establish redis connection
+    let mut conn = app_state.redis.get().await?;
 
-  // Combine `id` and `body` into a single JSON structure.
-  let payload = serde_json::json!({
+    // Combine `id` and `body` into a single JSON structure.
+    let payload = serde_json::json!({
         "id": id,
         "data": body
     });
-  // Convert the JSON to a string for publishing
-  let payload_str = payload.to_string();
-  // send redis pubsub
-  let () = conn.publish("task:update", payload_str).await?;
+    // Convert the JSON to a string for publishing
+    let payload_str = payload.to_string();
+    // send redis pubsub
+    let () = conn.publish("task:update", payload_str).await?;
 
-  Ok(StatusCode::OK)
+    Ok(StatusCode::OK)
 }

@@ -4,7 +4,7 @@ use generals::envs::Env;
 use redis::{ErrorKind, RedisError};
 
 fn get_redis_uri() -> String {
-  Env::get_redis().unwrap()
+    Env::get_redis().unwrap()
 }
 
 pub async fn connect() -> Result<Pool<RedisConnectionManager>, RedisError> {

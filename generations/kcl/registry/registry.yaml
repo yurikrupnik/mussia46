@@ -1,0 +1,192 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: CompositeResourceDefinition
+metadata:
+  annotations:
+    app.kubernetes.io/owner: Yuri Krupnik (krupnik.yuri@gmail.com)
+  labels:
+    team: platform
+    app.kubernetes.io/part-of: iac
+  name: registries.yurikrupnik.com
+spec:
+  claimNames:
+    kind: RegistryClaim
+    plural: registriesclaims
+  defaultCompositeDeletePolicy: Background
+  defaultCompositionRef:
+    name: gcp-registry
+  defaultCompositionUpdatePolicy: Automatic
+  group: yurikrupnik.com
+  names:
+    kind: Registry
+    plural: registries
+  versions:
+  - additionalPrinterColumns:
+    - jsonPath: '.status.url'
+      name: url
+      type: string
+    name: v1alpha1
+    referenceable: true
+    schema:
+      openAPIV3Schema:
+        type: object
+        properties:
+          spec:
+            type: object
+            required: []
+            properties:
+              location:
+                type: string
+                description: Location where the registry should be created.
+                examples:
+                - europe-west1 (GCP)
+                - eu-west-1 (AWS)
+          status:
+            type: object
+            properties:
+              url:
+                type: string
+    served: true
+---
+apiVersion: apiextensions.crossplane.io/v1
+kind: Composition
+metadata:
+  labels:
+    provider: aws
+  name: aws-registry
+spec:
+  compositeTypeRef:
+    apiVersion: yurikrupnik.com/v1alpha1
+    kind: Registry
+  mode: Pipeline
+  pipeline:
+  - functionRef:
+      name: function-patch-and-transform
+    input:
+      apiVersion: pt.fn.crossplane.io/v1beta1
+      kind: Resources
+      resources:
+      - name: aws-registry
+        base:
+          apiVersion: ecr.aws.upbound.io/v1beta1
+          kind: Repository
+          metadata:
+            annotations:
+              lol: shit
+            labels:
+              composite: crossplane-stam
+              omg: lolsss
+          spec:
+            deletionPolicy: Delete
+            forProvider:
+              imageTagMutability: IMMUTABLE
+              region: eu-west-1
+              tags:
+                iac: crossplane
+            managementPolicies:
+            - '*'
+        patches:
+        - fromFieldPath: spec.location
+          toFieldPath: spec.forProvider.region
+        - fromFieldPath: spec.providerConfigRef
+          toFieldPath: spec.providerConfigRef
+        - fromFieldPath: metadata.name
+          toFieldPath: metadata.annotations[lol]
+        - type: ToCompositeFieldPath
+          fromFieldPath: status.atProvider.repositoryUrl
+          toFieldPath: status.url
+    step: patch-and-transform
+  - functionRef:
+      name: kcl-function
+    input:
+      apiVersion: krm.kcl.dev/v1alpha1
+      kind: KCLInput
+      metadata:
+        name: basic
+      spec:
+        source: |2
+
+          oxr = option("params").oxr
+          ocds = option("params").ocds
+          dxr = {
+              **option("params").dxr
+              status.dummy = "cool-status"
+          }
+          storage = {
+            apiVersion = "yurikrupnik.com/v1alpha1"
+            kind: "Storage"
+            metadata.name = "crossplane-arisss"
+            spec = {
+              location = "eu-west-1"
+              compositionSelector.matchLabels.provider = "aws"
+            }
+          }
+          items = [
+            storage
+            dxr
+          ]
+    step: normal1
+  - functionRef:
+      name: function-auto-ready
+    step: automatically-detect-ready-composed-resources
+  writeConnectionSecretsToNamespace: crossplane-system
+---
+apiVersion: apiextensions.crossplane.io/v1
+kind: Composition
+metadata:
+  labels:
+    provider: gcp
+  name: gcp-registry
+spec:
+  compositeTypeRef:
+    apiVersion: yurikrupnik.com/v1alpha1
+    kind: Registry
+  mode: Pipeline
+  pipeline:
+  - functionRef:
+      name: function-patch-and-transform
+    input:
+      apiVersion: pt.fn.crossplane.io/v1beta1
+      kind: Resources
+      resources:
+      - name: gcp-registry
+        base:
+          apiVersion: artifact.gcp.upbound.io/v1beta1
+          kind: RegistryRepository
+          metadata:
+            annotations:
+              crossplane.io/external-name: default-gcp-name
+            name: default-gcp-name
+          spec:
+            deletionPolicy: Delete
+            forProvider:
+              description: example docker repository by crossplane
+              format: DOCKER
+              labels:
+                iac: crossplane
+              location: europe-west1
+            managementPolicies:
+            - '*'
+        patches:
+        - fromFieldPath: spec.location
+          toFieldPath: spec.forProvider.location
+        - fromFieldPath: spec.providerConfigRef
+          toFieldPath: spec.providerConfigRef
+        - fromFieldPath: metadata.name
+          toFieldPath: metadata.name
+        - fromFieldPath: metadata.name
+          toFieldPath: metadata.annotations[crossplane.io/external-name]
+        - type: CombineToComposite
+          combine:
+            variables:
+            - fromFieldPath: status.atProvider.location
+            - fromFieldPath: status.atProvider.project
+            - fromFieldPath: status.atProvider.name
+            strategy: string
+            string:
+              fmt: '%s-docker.pkg.dev/%s/%s'
+          toFieldPath: status.url
+    step: patch-and-transform
+  - functionRef:
+      name: function-auto-ready
+    step: automatically-detect-ready-composed-resources
+  writeConnectionSecretsToNamespace: crossplane-system
