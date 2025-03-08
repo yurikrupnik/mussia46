@@ -20,7 +20,6 @@ sqlx.workspace = true
 tokio.workspace = true
 tabled.workspace = true
 thiserror.workspace = true
-
 #crossterm = { version = "0.28", features = ["serde"] }
 #indicatif = "0.17"
 #ratatui = { version = "0.29", features = ["all-widgets"] }

@@ -1,16 +1,16 @@
 use super::model::{Book, CreateBook, UpdateBook};
 use crate::app_state::AppState;
 use axum::{
-  extract::{Json, Path, State},
-  http::StatusCode,
-  response::IntoResponse,
+    extract::{Json, Path, State},
+    http::StatusCode,
+    response::IntoResponse,
 };
 use log::{error, info};
 use services::postgres::{
-  results::{handle_delete_result, handle_drop_result, handle_result},
-  service::{
-    create_item, delete_by_id, drop_collection, get_by_id, get_list, update_by_id, SqlMethods,
-  },
+    results::{handle_delete_result, handle_drop_result, handle_result},
+    service::{
+        create_item, delete_by_id, drop_collection, get_by_id, get_list, update_by_id, SqlMethods,
+    },
 };
 use uuid::Uuid;
 use validator::Validate;
@@ -34,12 +34,12 @@ use validator::Validate;
   ),
 )]
 pub async fn get_books(State(app_state): State<AppState>) -> impl IntoResponse {
-  let query = "where title = 'ariss'";
-  // let query = "where title = 'ariss'";
-  // let result = get_list::<Book>(&app_state.pool, Some(query)).await;
-  // let result = SqlService::get_list(&app_state.pool, Some(query)).await;
-  let result = Book::get_list(&app_state.pool, &Some(query)).await;
-  handle_result(result, StatusCode::OK)
+    let query = "where title = 'ariss'";
+    // let query = "where title = 'ariss'";
+    // let result = get_list::<Book>(&app_state.pool, Some(query)).await;
+    // let result = SqlService::get_list(&app_state.pool, Some(query)).await;
+    let result = Book::get_list(&app_state.pool, &Some(query)).await;
+    handle_result(result, StatusCode::OK)
 }
 
 /// Get Book by id.
@@ -58,19 +58,19 @@ pub async fn get_books(State(app_state): State<AppState>) -> impl IntoResponse {
   )
 )]
 pub async fn get_book(
-  Path(id): Path<String>,
-  State(app_state): State<AppState>,
+    Path(id): Path<String>,
+    State(app_state): State<AppState>,
 ) -> impl IntoResponse {
-  info!("Get book by id: {}", &id);
-  // Parse the id as a UUID
-  let item_id = match Uuid::parse_str(&id) {
-    Ok(id) => id,
-    Err(_) => return (StatusCode::BAD_REQUEST, "Invalid UUID format").into_response(),
-  };
-  // fetch the item from the database
-  let result = get_by_id::<Book>(&app_state.pool, &item_id).await;
-  // return the result of the query
-  handle_result(result, StatusCode::OK)
+    info!("Get book by id: {}", &id);
+    // Parse the id as a UUID
+    let item_id = match Uuid::parse_str(&id) {
+        Ok(id) => id,
+        Err(_) => return (StatusCode::BAD_REQUEST, "Invalid UUID format").into_response(),
+    };
+    // fetch the item from the database
+    let result = get_by_id::<Book>(&app_state.pool, &item_id).await;
+    // return the result of the query
+    handle_result(result, StatusCode::OK)
 }
 
 /// Delete Book by given path variable id.
@@ -100,13 +100,13 @@ pub async fn get_book(
   )
 )]
 pub async fn delete_book(Path(id): Path<String>, app_state: State<AppState>) -> impl IntoResponse {
-  // Parse the id as a UUID
-  let item_id = match Uuid::parse_str(&id) {
-    Ok(id) => id,
-    Err(_) => return (StatusCode::BAD_REQUEST, "Invalid UUID format").into_response(),
-  };
-  let result = delete_by_id::<Book>(&app_state.pool, &item_id).await;
-  handle_delete_result(result, &item_id.to_string())
+    // Parse the id as a UUID
+    let item_id = match Uuid::parse_str(&id) {
+        Ok(id) => id,
+        Err(_) => return (StatusCode::BAD_REQUEST, "Invalid UUID format").into_response(),
+    };
+    let result = delete_by_id::<Book>(&app_state.pool, &item_id).await;
+    handle_delete_result(result, &item_id.to_string())
 }
 
 /// Create new Book.
@@ -128,14 +128,14 @@ responses(
 )
 )]
 pub async fn create_book(
-  app_state: State<AppState>,
-  Json(body): Json<CreateBook>,
+    app_state: State<AppState>,
+    Json(body): Json<CreateBook>,
 ) -> impl IntoResponse {
-  if let Err(error) = body.validate() {
-    return (StatusCode::BAD_REQUEST, Json(error)).into_response();
-  }
-  let result = create_item::<Book, CreateBook>(&app_state.pool, &body).await;
-  handle_result(result, StatusCode::CREATED)
+    if let Err(error) = body.validate() {
+        return (StatusCode::BAD_REQUEST, Json(error)).into_response();
+    }
+    let result = create_item::<Book, CreateBook>(&app_state.pool, &body).await;
+    handle_result(result, StatusCode::CREATED)
 }
 
 /// Drop Book collection.
@@ -151,8 +151,8 @@ pub async fn create_book(
   ),
 )]
 pub async fn drop_books(app_state: State<AppState>) -> impl IntoResponse {
-  let result = drop_collection::<Book>(&app_state.pool).await;
-  handle_drop_result(result)
+    let result = drop_collection::<Book>(&app_state.pool).await;
+    handle_drop_result(result)
 }
 
 /// Update Book with given id.
@@ -180,34 +180,34 @@ security(
 )
 )]
 pub async fn update_book(
-  app_state: State<AppState>,
-  Path(id): Path<String>,
-  Json(body): Json<UpdateBook>,
+    app_state: State<AppState>,
+    Path(id): Path<String>,
+    Json(body): Json<UpdateBook>,
 ) -> impl IntoResponse {
-  if let Err(error) = body.validate() {
-    return (StatusCode::BAD_REQUEST, Json(error)).into_response();
-  }
-
-  // Parse the id as a UUID
-  let item_id = match Uuid::parse_str(&id) {
-    Ok(id) => id,
-    Err(_) => return (StatusCode::BAD_REQUEST, "Invalid UUID format").into_response(),
-  };
-
-  let result = update_by_id::<Book, UpdateBook>(&app_state.pool, &item_id, &body).await;
-
-  match result {
-    Ok(payload) => {
-      info!("Data: {:?}", &payload);
-      (StatusCode::OK, Json(&payload)).into_response()
+    if let Err(error) = body.validate() {
+        return (StatusCode::BAD_REQUEST, Json(error)).into_response();
     }
-    Err(sqlx::Error::ColumnNotFound(msg)) => {
-      error!("ColumnNotFound: {:?}", &msg);
-      (StatusCode::BAD_REQUEST, Json(msg)).into_response()
+
+    // Parse the id as a UUID
+    let item_id = match Uuid::parse_str(&id) {
+        Ok(id) => id,
+        Err(_) => return (StatusCode::BAD_REQUEST, "Invalid UUID format").into_response(),
+    };
+
+    let result = update_by_id::<Book, UpdateBook>(&app_state.pool, &item_id, &body).await;
+
+    match result {
+        Ok(payload) => {
+            info!("Data: {:?}", &payload);
+            (StatusCode::OK, Json(&payload)).into_response()
+        }
+        Err(sqlx::Error::ColumnNotFound(msg)) => {
+            error!("ColumnNotFound: {:?}", &msg);
+            (StatusCode::BAD_REQUEST, Json(msg)).into_response()
+        }
+        Err(e) => {
+            error!("Error: {:?}", &e.to_string());
+            (StatusCode::INTERNAL_SERVER_ERROR, Json(&e.to_string())).into_response()
+        }
     }
-    Err(e) => {
-      error!("Error: {:?}", &e.to_string());
-      (StatusCode::INTERNAL_SERVER_ERROR, Json(&e.to_string())).into_response()
-    }
-  }
 }

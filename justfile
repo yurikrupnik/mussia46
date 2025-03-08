@@ -10,7 +10,12 @@ default:
 #    tilt up
 #    helm install my-kubeshark kubeshark-helm-charts/kubeshark --version 52.3.69
 #    helm repo add kubeshark-helm-charts https://helm.kubeshark.co/
-
+nus:
+  nu
+  source manifests/scripts/ai.nu
+  source manifests/scripts/cluster.nu
+  source manifests/scripts/greet.nu
+  get-hyperscaler
 lint:
     popeye -A -s cm
     kubent -o json
@@ -23,7 +28,6 @@ lint:
 #    -kubectl create secret docker-registry docker-registry-secret --docker-server=me-west1-docker.pkg.dev  --docker-username=_json_key --docker-password="$(cat ./tmp/container-puller.json)" --docker-email=container-puller-sa@devops-386509.iam.gserviceaccount.com
 cluster:
     -kind create cluster --config ./manifests/cluster/cluster.yaml
-    sleep 20
 _local:
     -kind create cluster --config ./scripts/cluster.yaml
     sleep 20
@@ -36,11 +40,23 @@ _local:
 #    timoni bundle build -f manifests/bundle.cue -r manifests/runtime.cue --runtime-from-env
 
 # kubectl annotate node --all kwasm.sh/kwasm-node=true # Annonate the nodes to support wasm runtime
-_eho:
+_echo:
     echo hello
 
-kdash:
+kdash: # check from here - https://itnext.io/essential-cli-tui-tools-for-developers-7e78f0cd27db
     kdash
+    ktop
+    ctop
+    lazydocker
+    dive
+    ATAC
+    vegeta
+    dog
+    asciinema
+
+run-func:
+  crossplane render xr.yaml composition.yaml functions.yaml | crossplane validate schemaDir -
+  crossplane validate xr.yaml composition.yaml functions.yaml
 
 migrate:
   -sqlx migrate run --database-url=postgres://myuser:mypassword@localhost/mydatabase --source manifests/dbs/migrations/postgres/
@@ -80,3 +96,6 @@ frame:
 bacon:
     bacon clippy
     bacon test
+secrets:
+  echo 'foo: ref+gcpsecrets://playground-447016/github-secret' | vals eval -f -
+# see https://www.kcl-lang.io/docs/user_docs/guides/secret-management/vault for more examples with deployment - do not understand why add secret to annotation

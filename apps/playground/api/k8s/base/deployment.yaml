@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: actix-app
+  labels:
+    app: actix-app
+spec:
+  replicas: 1
+  template:
+    metadata:
+      name: actix-app
+      labels:
+        app: actix-app
+    spec:
+      serviceAccountName: actix-app
+      restartPolicy: Always
+      containers:
+        - name: actix-app
+          image: yurikrupnik/actix-app:latest
+          imagePullPolicy: IfNotPresent
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "100m"
+            limits:
+              memory: "128Mi"
+              cpu: "200m"
+          env:
+            - name: PORT
+              value: "8080"
+            - name: RUST_LOG
+              value: "info"
+            - name: RUST_ENV
+              value: development
+            - name: MONGO_URI
+              value: "mongodb://mongodb-service.dbs.svc.cluster.local"
+            - name: REDIS_HOST
+              value: "redis-service.dbs.svc.cluster.local"
+            - name: DATABASE_URL
+              value: "postgres://myuser:mypassword@postgres-service.dbs.svc.cluster.local"
+            - name: INFLUXDB_URL
+              value: "http://localhost:8086"
+            - name: INFLUXDB_TOKEN
+              value: "admintoken123"
+            - name: INFLUXDB_ORG_ID
+              value: "docs"
+  selector:
+    matchLabels:
+
+      app: actix-app

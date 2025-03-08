@@ -1,0 +1,162 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: CompositeResourceDefinition
+metadata:
+  labels:
+    app.kubernetes.io/managed-by: timoni
+    app.kubernetes.io/name: nginx
+    app.kubernetes.io/part-of: iac
+    app.kubernetes.io/version: 0.0.0-devel
+    team: platform
+  name: compositestorages.platform.yurikrupnik.com
+spec:
+  claimNames:
+    kind: Storage
+    plural: storages
+  defaultCompositionRef:
+    name: gcp-storage
+  group: platform.yurikrupnik.com
+  names:
+    kind: CompositeStorage
+    plural: compositestorages
+  versions:
+    - additionalPrinterColumns:
+        - jsonPath: .status.url
+          name: url
+          type: string
+        - jsonPath: .status.id
+          name: id
+          type: string
+        - jsonPath: .status.cloud-url
+          name: cloud-url
+          type: string
+      name: v1alpha1
+      referenceable: true
+      schema:
+        openAPIV3Schema:
+          properties:
+            spec:
+              properties:
+                location:
+                  description: Location where the bucket should be created.
+                  examples:
+                    - us-west1 (GCP)
+                    - us-west-1 (AWS)
+                    - europe-west1 (GCP)
+                    - eu-west-1 (AWS)
+                  type: string
+              required: []
+              type: object
+            status:
+              properties:
+                cloud-url:
+                  type: string
+                id:
+                  type: string
+                url:
+                  type: string
+              type: object
+          type: object
+      served: true
+---
+apiVersion: apiextensions.crossplane.io/v1
+kind: Composition
+metadata:
+  labels:
+    provider: gcp
+  name: gcp-storage
+spec:
+  compositeTypeRef:
+    apiVersion: platform.yurikrupnik.com/v1alpha1
+    kind: CompositeStorage
+  mode: Pipeline
+  pipeline:
+    - functionRef:
+        name: function-patch-and-transform
+      input:
+        apiVersion: pt.fn.crossplane.io/v1beta1
+        kind: Resources
+        resources:
+          - base:
+              apiVersion: storage.gcp.upbound.io/v1beta1
+              kind: Bucket
+              spec:
+                forProvider:
+                  location: me-west1
+                  storageClass: STANDARD
+                  uniformBucketLevelAccess: true
+            name: google-bucket
+            patches:
+              - fromFieldPath: spec.location
+                toFieldPath: spec.forProvider.location
+              - fromFieldPath: status.atProvider.id
+                toFieldPath: status.id
+                type: ToCompositeFieldPath
+              - fromFieldPath: status.atProvider.selfLink
+                toFieldPath: status.url
+                type: ToCompositeFieldPath
+              - fromFieldPath: status.atProvider.url
+                toFieldPath: status.cloud-url
+                type: ToCompositeFieldPath
+      step: patch-and-transform
+    - functionRef:
+        name: function-auto-ready
+      step: automatically-detect-ready-composed-resources
+  writeConnectionSecretsToNamespace: crossplane-system
+---
+apiVersion: apiextensions.crossplane.io/v1
+kind: Composition
+metadata:
+  labels:
+    provider: aws
+  name: aws-storage
+spec:
+  compositeTypeRef:
+    apiVersion: platform.yurikrupnik.com/v1alpha1
+    kind: CompositeStorage
+  mode: Pipeline
+  pipeline:
+    - functionRef:
+        name: function-patch-and-transform
+      input:
+        apiVersion: pt.fn.crossplane.io/v1beta1
+        kind: Resources
+        resources:
+          - base:
+              apiVersion: s3.aws.upbound.io/v1beta1
+              kind: Bucket
+              spec:
+                forProvider:
+                  region: il-central-1
+            connectionDetails:
+              - fromFieldPath: status.atProvider.selfLink
+                name: selfLink
+                type: FromFieldPath
+            name: amazon-bucket
+            patches:
+              - fromFieldPath: spec.location
+                toFieldPath: spec.forProvider.region
+              - fromFieldPath: status.atProvider.id
+                toFieldPath: status.id
+                type: ToCompositeFieldPath
+              - fromFieldPath: status.atProvider.bucketRegionalDomainName
+                toFieldPath: status.url
+                transforms:
+                  - string:
+                      fmt: https://%s
+                      type: Format
+                    type: string
+                type: ToCompositeFieldPath
+              - fromFieldPath: status.atProvider.id
+                toFieldPath: status.cloud-url
+                transforms:
+                  - string:
+                      fmt: s3://%s
+                      type: Format
+                    type: string
+                type: ToCompositeFieldPath
+      step: patch-and-transform
+    - functionRef:
+        name: function-auto-ready
+      step: automatically-detect-ready-composed-resources
+  writeConnectionSecretsToNamespace: crossplane-system
+---

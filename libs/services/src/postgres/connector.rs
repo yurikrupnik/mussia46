@@ -2,7 +2,7 @@ use generals::envs::Env;
 use sqlx::{postgres::PgPoolOptions, Pool, Postgres};
 
 fn get_sql_uri() -> String {
-  Env::get_postgres().unwrap()
+    Env::get_postgres().unwrap()
 }
 pub async fn connect(
     url: Option<&str>,

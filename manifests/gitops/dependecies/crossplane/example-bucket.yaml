@@ -1,0 +1,68 @@
+
+apiVersion: yurikrupnik.com/v1alpha1
+kind: StorageClaim
+metadata:
+  name: crossplane-bucketaa
+spec:
+  id: crossplane-ares
+  parameters:
+    location: europe-west1
+    description: main network for my usage
+#    production: false
+    subnetworks:
+      - name: net1
+        region: "us-west2"
+        description: "some desc0"
+        cidrRange: "10.138.0.0/20"
+      - name: net2
+        region: "us-west3"
+        description: "some desc1"
+        cidrRange: "10.137.0.0/20"
+  compositionSelector:
+    matchLabels:
+      provider: gcp
+---
+apiVersion: yurikrupnik.com/v1alpha1
+kind: StorageClaim
+metadata:
+  name: crossplane-bucketaaa
+spec:
+  id: crossplane-yurasik
+  parameters:
+    location: eu-west-2
+  compositionSelector:
+    matchLabels:
+      provider: aws
+---
+#apiVersion: yurikrupnik.com/v1alpha1
+#kind: RegistryClaim
+#metadata:
+#  name: crossplane-regi1
+#spec:
+#  id: crossplane-regi1
+#  parameters:
+#    location: europe-west1
+#  compositionSelector:
+#    matchLabels:
+#      provider: gcp
+#---
+#apiVersion: yurikrupnik.com/v1alpha1
+#kind: RegistryClaim
+#metadata:
+#  name: crossplane-aris
+#spec:
+#  id: crossplane-aris
+#  parameters:
+#    location: eu-west-1
+#  compositionSelector:
+#    matchLabels:
+#      provider: aws
+#---
+#apiVersion: ecr.aws.upbound.io/v1beta1
+#kind: Repository
+#metadata:
+#  name: alper-test-repo
+#spec:
+#  forProvider:
+#    imageTagMutability: IMMUTABLE
+#    region: eu-west-1

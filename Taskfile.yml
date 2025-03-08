@@ -28,12 +28,9 @@ tasks:
       - kubectl -n argocd wait deployment argocd-server --for=condition=Available --timeout=180s
       - argocd admin initial-password -n argocd
       - kubectl apply -f manifests/gitops/infra/argocd/
-      - kubectl apply -f manifests/gitops/infra/monitoring/
+      - kubectl apply -f manifests/gitops/infra/monitoring/index.yaml
       - kubectl apply -f manifests/gitops/infra/external-secrets/
       - kubectl apply -f manifests/gitops/infra/crossplane/
-#      - kubectl apply -f manifests/gitops/infra/argocd-rollouts/
-#      - kubectl apply -f manifests/gitops/infra/argocd-events/
-#      - kubectl apply -f manifests/gitops/infra/argocd-workflows/
       - kubectl create ns apps
       - sleep 60 # sleep for 30 sec to wait for flux to install all deps
       - kubectl -n crossplane-system wait deployment crossplane --for=condition=Available --timeout=180s
@@ -46,7 +43,13 @@ tasks:
       - kubectl wait "providers.pkg.crossplane.io/provider-gcp-storage" --for=condition=Healthy --timeout=600s
       - kubectl wait "providers.pkg.crossplane.io/provider-gcp-storage" --for=condition=Installed --timeout=600s
       - kubectl apply -f manifests/gitops/dependecies/crossplane/provider-config.yaml
-      - kubectl apply -f manifests/gitops/dependecies/crossplane/index.yaml
+#      - kubectl apply -f manifests/gitops/dependecies/crossplane/storage.yaml
+#      - kubectl apply -f manifests/gitops/dependecies/crossplane/example-bucket.yaml
+#      new kcl module for stoage
+      #- kubectl apply -f generations/kcl/my_package/new-storage.yaml
+      #- kubectl apply -f manifests/gitops/dependecies/crossplane/example-bucket-kcl.yaml
+      #      deploy new cue package and resources then
+#      - kubectl apply -f manifests/gitops/dependecies/crossplane/index.yaml
 #      - kubectl apply -f manifests/gitops/infra/keda/
 #      - kubectl create secret generic gcp-secret -n crossplane-system --from-file=creds=./tmp/iac/gcp-credentials.json
 #      - kubectl create secret generic es-secret -n external-secrets --from-file=creds=./tmp/secrets/gcp-credentials.json

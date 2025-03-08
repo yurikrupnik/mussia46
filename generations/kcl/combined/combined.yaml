@@ -1,0 +1,121 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: CompositeResourceDefinition
+metadata:
+  annotations:
+    app.kubernetes.io/owner: Yuri Krupnik (krupnik.yuri@gmail.com)
+  labels:
+    team: platform
+    app.kubernetes.io/part-of: iac
+  name: combineds.yurikrupnik.com
+spec:
+  claimNames:
+    kind: CombinedClaim
+    plural: combinedsclaims
+  defaultCompositeDeletePolicy: Background
+  defaultCompositionRef:
+    name: gcp-combined
+  defaultCompositionUpdatePolicy: Automatic
+  group: yurikrupnik.com
+  names:
+    kind: Combined
+    plural: combineds
+  versions:
+  - name: v1alpha1
+    referenceable: true
+    schema:
+      openAPIV3Schema:
+        type: object
+        properties:
+          spec:
+            type: object
+            required: []
+            properties:
+              location:
+                type: string
+                description: Location where the registry should be created.
+                examples:
+                - europe-west1 (GCP)
+                - eu-west-1 (AWS)
+    served: true
+---
+apiVersion: apiextensions.crossplane.io/v1
+kind: Composition
+metadata:
+  labels:
+    provider: aws
+  name: aws-combined
+spec:
+  compositeTypeRef:
+    apiVersion: yurikrupnik.com/v1alpha1
+    kind: Combined
+  mode: Pipeline
+  pipeline:
+  - functionRef:
+      name: function-patch-and-transform
+    input:
+      apiVersion: pt.fn.crossplane.io/v1beta1
+      kind: Resources
+      resources:
+      - name: aws-combined-registry
+        base:
+          apiVersion: yurikrupnik.com/v1alpha1
+          kind: Registry
+          metadata:
+            name: some-name
+          spec:
+            location: eu-west-1
+        patches:
+        - fromFieldPath: spec.location
+          toFieldPath: spec.location
+        - fromFieldPath: spec.compositionSelector
+          toFieldPath: spec.compositionSelector
+        - fromFieldPath: spec.providerConfigRef
+          toFieldPath: spec.providerConfigRef
+        - fromFieldPath: metadata.name
+          toFieldPath: metadata.name
+    step: patch-and-transform
+  - functionRef:
+      name: function-auto-ready
+    step: automatically-detect-ready-composed-resources
+  writeConnectionSecretsToNamespace: crossplane-system
+---
+apiVersion: apiextensions.crossplane.io/v1
+kind: Composition
+metadata:
+  labels:
+    provider: gcp
+  name: gcp-combined
+spec:
+  compositeTypeRef:
+    apiVersion: yurikrupnik.com/v1alpha1
+    kind: Combined
+  mode: Pipeline
+  pipeline:
+  - functionRef:
+      name: function-patch-and-transform
+    input:
+      apiVersion: pt.fn.crossplane.io/v1beta1
+      kind: Resources
+      resources:
+      - name: gcp-combined-registry
+        base:
+          apiVersion: yurikrupnik.com/v1alpha1
+          kind: Registry
+          metadata:
+            name: some-name
+          spec:
+            location: europe-west1
+        patches:
+        - fromFieldPath: spec.location
+          toFieldPath: spec.location
+        - fromFieldPath: spec.compositionSelector
+          toFieldPath: spec.compositionSelector
+        - fromFieldPath: spec.providerConfigRef
+          toFieldPath: spec.providerConfigRef
+        - fromFieldPath: metadata.name
+          toFieldPath: metadata.name
+    step: patch-and-transform
+  - functionRef:
+      name: function-auto-ready
+    step: automatically-detect-ready-composed-resources
+  writeConnectionSecretsToNamespace: crossplane-system

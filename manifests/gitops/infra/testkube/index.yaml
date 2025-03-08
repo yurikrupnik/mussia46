@@ -13,11 +13,11 @@ metadata:
 spec:
   targetNamespace: testkube
   chart:
-    metadata:
-      labels:
-        app.kubernetes.io/managed-by: timoni
-        app.kubernetes.io/name: testkube
-        app.kubernetes.io/version: 2.4.0-2
+#    metadata:
+#      labels:
+#        app.kubernetes.io/managed-by: timoni
+#        app.kubernetes.io/name: testkube
+#        app.kubernetes.io/version: 2.4.0-2
     spec:
       chart: testkube
       interval: 60m
@@ -60,10 +60,10 @@ spec:
 apiVersion: source.toolkit.fluxcd.io/v1
 kind: HelmRepository
 metadata:
-  labels:
-    app.kubernetes.io/managed-by: timoni
-    app.kubernetes.io/name: testkube
-    app.kubernetes.io/version: 2.4.0-2
+#  labels:
+#    app.kubernetes.io/managed-by: timoni
+#    app.kubernetes.io/name: testkube
+#    app.kubernetes.io/version: 2.4.0-2
   name: testkube
   namespace: flux-system
 spec:

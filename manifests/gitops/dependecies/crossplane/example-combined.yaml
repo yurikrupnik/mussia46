@@ -1,0 +1,37 @@
+---
+apiVersion: yurikrupnik.com/v1alpha1
+kind: CombinedClaim
+metadata:
+  name: crossplane-combined2
+spec:
+  location: europe-west1
+  compositionSelector:
+    matchLabels:
+      provider: gcp
+---
+apiVersion: yurikrupnik.com/v1alpha1
+kind: CombinedClaim
+metadata:
+  name: crossplane-combined1
+spec:
+  location: eu-west-1
+  compositionSelector:
+    matchLabels:
+      provider: aws
+---
+apiVersion: yurikrupnik.com/v1alpha1
+kind: CombinedClaim
+metadata:
+  name: crossplane-combined3
+spec:
+  location: europe-west1
+---
+apiVersion: yurikrupnik.com/v1alpha1
+kind: CombinedClaim
+metadata:
+  name: crossplane-combined4
+spec:
+  location: europe-west2
+#  compositionSelector:
+#    matchLabels:
+#      provider: gcp

@@ -1,0 +1,41 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: CompositeResourceDefinition
+metadata:
+  name: xstorages.yurikrupnik.com
+spec:
+  claimNames:
+    kind: Storage
+    plural: storages
+  group: yurikrupnik.com
+  names:
+    categories:
+    - crossplane
+    kind: XStorage
+    plural: xstorages
+  versions:
+  - name: v1alpha1
+    referenceable: true
+    schema:
+      openAPIV3Schema:
+        description: Storage is the Schema for the Storage API.
+        properties:
+          spec:
+            description: StorageSpec defines the desired state of Storage.
+            properties:
+              id:
+                type: string
+              parameters:
+                properties:
+                  location:
+                    type: string
+                  name:
+                    type: string
+                type: object
+            type: object
+          status:
+            description: StorageStatus defines the observed state of Storage.
+            type: object
+        required:
+        - spec
+        type: object
+    served: true

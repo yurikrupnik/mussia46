@@ -1,0 +1,20 @@
+
+apiVersion: platform.aris.com/v1alpha1
+kind: Storage
+metadata:
+  name: crossplane-bucketas
+spec:
+  location: europe-west1
+  compositionSelector:
+    matchLabels:
+      provider: gcp
+---
+apiVersion: platform.aris.com/v1alpha1
+kind: Storage
+metadata:
+  name: crossplane-bucketaaad
+spec:
+  location: eu-west-1
+  compositionSelector:
+    matchLabels:
+      provider: aws

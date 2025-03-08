@@ -1,0 +1,23 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: Composition
+metadata:
+  name: xstorages.yurikrupnik.com
+spec:
+  compositeTypeRef:
+    apiVersion: yurikrupnik.com/v1alpha1
+    kind: XStorage
+  mode: Pipeline
+  pipeline:
+  - functionRef:
+      name: yurikrupnik-my-demoaws
+    step: aws
+  - functionRef:
+      name: crossplane-contrib-function-patch-and-transform
+    input:
+      apiVersion: pt.fn.crossplane.io/v1beta1
+      kind: Resources
+      resources: []
+    step: crossplane-contrib-function-patch-and-transform
+  - functionRef:
+      name: crossplane-contrib-function-auto-ready
+    step: crossplane-contrib-function-auto-ready

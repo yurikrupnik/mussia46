@@ -1,8 +1,4 @@
 use super::super::errors::Errors;
-// use crate::commands::{ClusterAction, ClusterSubcommand};
-// use crate::commands::{SystemAction, SystemSubcommand};
-// use crate::commands::{TaskAction, TaskSubcommand};
-// use crate::commands::{UserAction, UsersSubcommand};
 use crate::commands::{
     cluster::{ClusterAction, ClusterSubcommand},
     system::{SystemAction, SystemSubcommand},
@@ -11,7 +7,6 @@ use crate::commands::{
 };
 use clap::Parser;
 use futures::stream::{StreamExt, TryStreamExt};
-// Import required traits
 use models::task::{CreateTask, Task, UpdateTask};
 use proc_macros::DbResource;
 use serde::Serialize;
@@ -21,7 +16,6 @@ use services::postgres::queries::prepare_create_query;
 use services::postgres::service::{drop_collection, update_by_id};
 use sqlx::types::Uuid;
 use sqlx::{query_as, PgPool};
-// use std::any::Any;
 use std::fmt::Debug;
 use std::process::{Child, Command};
 use tabled::{Table, Tabled};

@@ -1,0 +1,8 @@
+docker_build(
+  "yurikrupnik/actix-app",
+  "../../..",
+  dockerfile="../../../manifests/dockers/rust-prod.Dockerfile",
+  build_args={"APP_NAME":"playground_api"},
+)
+
+k8s_resource("actix-app", port_forwards="5201:8080")

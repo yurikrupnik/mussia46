@@ -1,0 +1,25 @@
+[dependencies]
+  [dependencies.crossplane]
+    name = "crossplane"
+    full_name = "crossplane_1.17.3"
+    version = "1.17.3"
+    sum = "8hx/1t6Gn0UZjaycAJIJ2Xj1R7vefZq7mMpAim21COc="
+    reg = "ghcr.io"
+    repo = "kcl-lang/crossplane"
+    oci_tag = "1.17.3"
+  [dependencies.k8s]
+    name = "k8s"
+    full_name = "k8s_1.31.2"
+    version = "1.31.2"
+    sum = "xBZgPsnpVVyWBpahuPQHReeRx28eUHGFoaPeqbct+vs="
+    reg = "ghcr.io"
+    repo = "kcl-lang/k8s"
+    oci_tag = "1.31.2"
+  [dependencies.my_package]
+    name = "my_package"
+    full_name = "my_package_0.0.1"
+    version = "0.0.1"
+    sum = "7aL+0Vsaqdbe/5WeIdA4Hmp+tGHVWqyvIi/kL3brcTc="
+    reg = "europe-central2-docker.pkg.dev"
+    repo = "sdp-demo-388112/container-repo/exist_kcl_package"
+    oci_tag = "0.0.1"
