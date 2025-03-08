@@ -10,7 +10,7 @@ use tabled::Tabled;
 use utoipa::ToSchema;
 use validator::Validate;
 
-#[derive(DbResource, Debug, Deserialize, Serialize, ToSchema, Tabled)]
+#[derive(DbResource, Debug, Deserialize, Serialize, ToSchema, Tabled, Default)]
 pub struct Task {
     #[schema(default = "00000000-0000-0000-0000-000000000000")]
     pub id: Uuid,

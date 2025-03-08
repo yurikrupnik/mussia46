@@ -5,8 +5,8 @@ use axum::{
     http::StatusCode,
     response::IntoResponse,
 };
-use bb8::{PooledConnection, RunError};
-use bb8_redis::RedisConnectionManager;
+// use bb8::{PooledConnection, RunError};
+// use bb8_redis::RedisConnectionManager;
 use models::streams::{
     Stream, CREATE, DELETE, PAYLOAD, REDIS_STREAMS, TASKS_STREAM, UPDATE, USERS_STREAM,
 };
@@ -93,7 +93,7 @@ pub async fn delete_task(
     Path(id): Path<String>,
     app_state: State<AppState>,
 ) -> Result<StatusCode, AppError> {
-    let mut conn = app_state.redis.get().await?;
+    let mut conn = app_state.redis.get()?;
     let () = conn.publish("task:delete", &id).await?;
     Ok(StatusCode::OK)
 }
@@ -112,7 +112,7 @@ pub async fn create_task_redis(
     Json(body): Json<CreateTask>,
 ) -> Result<StatusCode, AppError> {
     body.validate()?;
-    let mut conn = app_state.redis.get().await?;
+    let mut conn = app_state.redis.get()?;
 
     // redis pubsub
     let () = conn.publish("task:create", &body).await?;
@@ -133,7 +133,7 @@ pub async fn create_task_redis(
   ),
 )]
 pub async fn drop_tasks(app_state: State<AppState>) -> Result<StatusCode, AppError> {
-    let mut conn = app_state.redis.get().await?;
+    let mut conn = app_state.redis.get()?;
     // redis pubsub
     let () = conn.publish("task:drop", "".to_string()).await?;
 
@@ -215,7 +215,7 @@ pub async fn update_task(
     // Validate
     body.validate()?;
     // establish redis connection
-    let mut conn = app_state.redis.get().await?;
+    let mut conn = app_state.redis.get()?;
 
     // Combine `id` and `body` into a single JSON structure.
     let payload = serde_json::json!({

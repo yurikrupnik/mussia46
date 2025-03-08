@@ -10,7 +10,12 @@ default:
 #    tilt up
 #    helm install my-kubeshark kubeshark-helm-charts/kubeshark --version 52.3.69
 #    helm repo add kubeshark-helm-charts https://helm.kubeshark.co/
-
+nus:
+  nu
+  source manifests/scripts/ai.nu
+  source manifests/scripts/cluster.nu
+  source manifests/scripts/greet.nu
+  get-hyperscaler
 lint:
     popeye -A -s cm
     kubent -o json
@@ -23,7 +28,6 @@ lint:
 #    -kubectl create secret docker-registry docker-registry-secret --docker-server=me-west1-docker.pkg.dev  --docker-username=_json_key --docker-password="$(cat ./tmp/container-puller.json)" --docker-email=container-puller-sa@devops-386509.iam.gserviceaccount.com
 cluster:
     -kind create cluster --config ./manifests/cluster/cluster.yaml
-    sleep 20
 _local:
     -kind create cluster --config ./scripts/cluster.yaml
     sleep 20

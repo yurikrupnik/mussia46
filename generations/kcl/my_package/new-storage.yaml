@@ -2,7 +2,7 @@ apiVersion: apiextensions.crossplane.io/v1
 kind: CompositeResourceDefinition
 metadata:
   annotations:
-    app.kubernetes.io/owner: Yuri Krupnik (krupnik.yuri@gmail.com)
+    app.kubernetes.io/owner: krupnik.yuri@gmail.com
   labels:
     team: platform
     app.kubernetes.io/part-of: iac
@@ -198,22 +198,20 @@ spec:
         source: |2
 
           oxr = option("params").oxr
+          _id = option("params").oxr.id
           ocds = option("params").ocds
-          _metadata = lambda suffix: str, kind: str -> any {
+          _metadata = lambda suffix: str -> any {
               {
-                  if suffix == "":
-                      name = oxr.spec.id
-                  else:
-                      name = oxr.spec.id + "-" + suffix
+                  name = _id
                   annotations = {
-                      "krm.kcl.dev/composition-resource-name" = oxr.spec.id + "-" + kind + "-" + suffix
+                      "krm.kcl.dev/composition-resource-name" = suffix
                   }
               }
           }
           network = {
             apiVersion = "compute.gcp.upbound.io/v1beta1"
             kind: "Network"
-            metadata = _metadata("", "omg")
+            metadata = _metadata("network")
             spec.forProvider = {
               autoCreateSubnetworks = False
               routingMode = "REGIONAL"
@@ -224,7 +222,7 @@ spec:
             {
               apiVersion = "compute.gcp.upbound.io/v1beta1"
               kind = "Subnetwork"
-              metadata = _metadata(subnetwork.name, "omg")
+              metadata = _metadata(subnetwork.name)
               spec.forProvider = {
                 region = subnetwork.region
                 ipCidrRange = subnetwork.cidrRange
@@ -238,7 +236,7 @@ spec:
           customNetwork = {
             apiVersion = "compute.gcp.upbound.io/v1beta1"
             kind = "Subnetwork"
-            metadata = _metadata("my-network", "omg")
+            metadata = _metadata("my-network")
             spec.forProvider = {
               region = "us-west2"
               ipCidrRange = "10.148.0.0/20"
@@ -251,7 +249,7 @@ spec:
           customNetwork1 = {
             apiVersion = "compute.gcp.upbound.io/v1beta1"
             kind = "Subnetwork"
-            metadata = _metadata("my-network1", "omg")
+            metadata = _metadata("my-network1")
             spec.forProvider = {
               region = "us-west2"
               ipCidrRange = "10.128.0.0/20"
@@ -264,7 +262,7 @@ spec:
           redis = {
             apiVersion = "redis.gcp.upbound.io/v1beta1"
             kind = "Instance"
-            metadata = _metadata("redis", "omg")
+            metadata = _metadata("lili")
             spec.forProvider = {
               tier = "STANDARD_HA" if oxr.spec.parameters.production else "BASIC"
               memorySizeGb = 3
@@ -283,7 +281,7 @@ spec:
               readReplicasMode = "READ_REPLICAS_ENABLED" if oxr.spec.parameters.production else "READ_REPLICAS_DISABLED"
             }
             spec.writeConnectionSecretToRef = {
-              name = "example-redis-instance-secret"
+              name = "lili-instance-secret"
               namespace = "crossplane-system"
             }
           }

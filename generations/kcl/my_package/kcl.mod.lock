@@ -30,3 +30,11 @@
     reg = "ghcr.io"
     repo = "kcl-lang/my_package"
     oci_tag = "0.0.1"
+  [dependencies.tekton]
+    name = "tekton"
+    full_name = "tekton_0.2.1"
+    version = "0.2.1"
+    sum = "/H2lb2t62LVwRbsgE7j3D5Gq+tMwK+es60Itb3OeJR0="
+    reg = "ghcr.io"
+    repo = "kcl-lang/tekton"
+    oci_tag = "0.2.1"

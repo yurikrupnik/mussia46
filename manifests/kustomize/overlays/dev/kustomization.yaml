@@ -1,0 +1,3 @@
+resources:
+  - ../../base
+  - ../../../../apps/playground/api/k8s/overlays/dev

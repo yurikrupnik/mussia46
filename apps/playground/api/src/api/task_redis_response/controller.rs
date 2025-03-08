@@ -14,8 +14,8 @@ use models::streams::{
     CrudActions, DeleteDto, ReadDto, Stream, StreamKeys, CREATE, DELETE, PAYLOAD, REDIS_STREAMS,
     TASKS_STREAM, UPDATE, USERS_STREAM,
 };
-use redis::{AsyncCommands, RedisResult};
-use serde_json::Error;
+use redis::{AsyncCommands, Commands, RedisResult};
+use serde_json::{to_string, Error};
 use services::postgres::{
     results::{handle_delete_result, handle_drop_result, handle_result},
     service::{create_item, delete_by_id, drop_collection, get_by_id, get_list, update_by_id},
@@ -57,29 +57,27 @@ pub async fn get_task(
 ) -> Result<Json<Task>, AppError> {
     let request_id = Uuid::new_v4().to_string();
 
-    let mut conn = app_state.redis.get().await?;
+    let mut conn = app_state.redis.get()?;
 
     Uuid::parse_str(&id)?;
     let object = ReadDto::new(id);
 
-    let body_as_json = serde_json::to_string(&object)?;
-    let msg_id: String = conn
-        .xadd(
-            "tasks_stream",
-            "*",
-            &[
-                (StreamKeys::Payload.as_ref(), body_as_json.as_str()),
-                (StreamKeys::RequestId.as_ref(), request_id.as_str()),
-                (StreamKeys::Action.as_ref(), CrudActions::Read.as_ref()),
-            ],
-        )
-        .await?;
+    let body_as_json = to_string(&object)?;
+    let msg_id: String = conn.xadd(
+        "tasks_stream",
+        "*",
+        &[
+            (StreamKeys::Payload.as_ref(), body_as_json.as_str()),
+            (StreamKeys::RequestId.as_ref(), request_id.as_str()),
+            (StreamKeys::Action.as_ref(), CrudActions::Read.as_ref()),
+        ],
+    )?;
 
     info!("Message added to 'tasks_stream' with ID: {}", msg_id);
 
     let response_key = format!("response:{}", request_id);
     let timeout = 30.0; // Timeout in seconds
-    let result: RedisResult<Option<(String, String)>> = conn.brpop(&response_key, timeout).await;
+    let result: RedisResult<Option<(String, String)>> = conn.brpop(&response_key, timeout);
     match result {
         Ok(Some((key, value))) => {
             let parsed = serde_json::from_str::<Task>(&value).map_err(|e| {
@@ -94,6 +92,8 @@ pub async fn get_task(
             Err(AppError::InternalError)
         }
     }
+    // let s = Task::default();
+    // Ok(Json(s))
 }
 
 /// Delete Task by given path variable id.
@@ -128,28 +128,26 @@ pub async fn delete_task(
 ) -> Result<StatusCode, AppError> {
     let request_id = Uuid::new_v4().to_string();
 
-    let mut conn = app_state.redis.get().await?;
+    let mut conn = app_state.redis.get()?;
 
     let object = DeleteDto::new(id);
 
-    let body_as_json = serde_json::to_string(&object)?;
-    let msg_id: String = conn
-        .xadd(
-            "tasks_stream",
-            "*",
-            &[
-                (StreamKeys::Payload.as_ref(), body_as_json.as_str()),
-                (StreamKeys::RequestId.as_ref(), request_id.as_str()),
-                (StreamKeys::Action.as_ref(), CrudActions::Delete.as_ref()),
-            ],
-        )
-        .await?;
+    let body_as_json = to_string(&object)?;
+    let msg_id: String = conn.xadd(
+        "tasks_stream",
+        "*",
+        &[
+            (StreamKeys::Payload.as_ref(), body_as_json.as_str()),
+            (StreamKeys::RequestId.as_ref(), request_id.as_str()),
+            (StreamKeys::Action.as_ref(), CrudActions::Delete.as_ref()),
+        ],
+    )?;
 
     info!("Message added to 'tasks_stream' with ID: {}", msg_id);
 
     let response_key = format!("response:{}", request_id);
     let timeout = 30.0; // Timeout in seconds
-    let result: RedisResult<Option<(String, String)>> = conn.brpop(&response_key, timeout).await;
+    let result: RedisResult<Option<(String, String)>> = conn.brpop(&response_key, timeout);
     match result {
         Ok(Some((key, value))) => match serde_json::from_str::<Task>(&value) {
             Ok(task) => {
@@ -166,6 +164,7 @@ pub async fn delete_task(
             Err(AppError::InternalError)
         }
     }
+    // Ok(StatusCode::OK)
 }
 
 #[utoipa::path(
@@ -183,29 +182,27 @@ pub async fn create_task_redis(
     // ) -> impl IntoResponse {
 ) -> Result<Json<Task>, AppError> {
     body.validate()?;
-    let mut conn = app_state.redis.get().await?;
+    let mut conn = app_state.redis.get()?;
 
     let request_id = Uuid::new_v4().to_string();
 
     let body_as_json = serde_json::to_string(&body)?;
-    let msg_id: String = conn
-        .xadd(
-            "tasks_stream",
-            "*",
-            &[
-                (StreamKeys::Payload.as_ref(), body_as_json.as_str()),
-                (StreamKeys::RequestId.as_ref(), request_id.as_str()),
-                (StreamKeys::Action.as_ref(), CrudActions::Create.as_ref()),
-            ],
-        )
-        .await?;
+    let msg_id: String = conn.xadd(
+        "tasks_stream",
+        "*",
+        &[
+            (StreamKeys::Payload.as_ref(), body_as_json.as_str()),
+            (StreamKeys::RequestId.as_ref(), request_id.as_str()),
+            (StreamKeys::Action.as_ref(), CrudActions::Create.as_ref()),
+        ],
+    )?;
 
     info!("Message added to 'tasks_stream' with ID: {}", msg_id);
 
     // Step 6: Block on BRPOP on "response:<request_id>" with a timeout (e.g., 30 seconds)
     let response_key = format!("response:{}", request_id);
     let timeout = 30.0; // Timeout in seconds
-    let result: RedisResult<Option<(String, String)>> = conn.brpop(&response_key, timeout).await;
+    let result: RedisResult<Option<(String, String)>> = conn.brpop(&response_key, timeout);
     match result {
         Ok(Some((key, value))) => match serde_json::from_str::<Task>(&value) {
             Ok(task) => Ok(Json(task)),
@@ -228,6 +225,9 @@ pub async fn create_task_redis(
           // )
           //     .into_response(),
     }
+    // Ok((StatusCode::OK, "da".to_string()))
+    //   let s = Task::default();
+    //   Ok(Json(s))
 }
 
 /// Drop Task collection.
@@ -243,28 +243,26 @@ pub async fn create_task_redis(
   ),
 )]
 pub async fn drop_tasks(app_state: State<AppState>) -> Result<(StatusCode, String), AppError> {
-    let mut conn = app_state.redis.get().await?;
+    let mut conn = app_state.redis.get()?;
 
     let request_id = Uuid::new_v4().to_string();
 
-    let msg_id: String = conn
-        .xadd(
-            "tasks_stream",
-            "*",
-            &[
-                (StreamKeys::Payload.as_ref(), ""),
-                (StreamKeys::RequestId.as_ref(), request_id.as_str()),
-                (StreamKeys::Action.as_ref(), CrudActions::Drop.as_ref()),
-            ],
-        )
-        .await?;
+    let msg_id: String = conn.xadd(
+        "tasks_stream",
+        "*",
+        &[
+            (StreamKeys::Payload.as_ref(), ""),
+            (StreamKeys::RequestId.as_ref(), request_id.as_str()),
+            (StreamKeys::Action.as_ref(), CrudActions::Drop.as_ref()),
+        ],
+    )?;
 
     info!("Message added to 'tasks_stream' with ID: {}", msg_id);
 
-    // Step 6: Block on BRPOP on "response:<request_id>" with a timeout (e.g., 30 seconds)
+    // // Step 6: Block on BRPOP on "response:<request_id>" with a timeout (e.g., 30 seconds)
     let response_key = format!("response:{}", request_id);
     let timeout = 30.0; // Timeout in seconds
-    let result: RedisResult<Option<(String, String)>> = conn.brpop(&response_key, timeout).await;
+    let result: RedisResult<Option<(String, String)>> = conn.brpop(&response_key, timeout);
     match result {
         Ok(Some((key, value))) => match serde_json::from_str::<String>(&value) {
             Ok(message) => Ok((StatusCode::OK, message)),
@@ -281,6 +279,7 @@ pub async fn drop_tasks(app_state: State<AppState>) -> Result<(StatusCode, Strin
             Err(AppError::InternalError)
         }
     }
+    // Ok((StatusCode::OK, "da".to_string()))
 }
 
 /// Update Task with given id.
@@ -357,7 +356,7 @@ pub async fn update_task(
 ) -> Result<StatusCode, AppError> {
     // Validate
     body.validate()?;
-    let mut conn = app_state.redis.get().await?;
+    let mut conn = app_state.redis.get()?;
 
     // Combine `id` and `body` into a single JSON structure.
     let payload = serde_json::json!({
@@ -365,9 +364,9 @@ pub async fn update_task(
         "data": body
     });
     // Convert the JSON to a string for publishing
-    let payload_str = payload.to_string();
+    // let payload_str = payload.to_string();
     // redis pubsub
-    let () = conn.publish("task:update", payload_str).await?;
+    // let () = conn.publish("task:update", payload_str).await?;
 
     Ok(StatusCode::OK)
 }

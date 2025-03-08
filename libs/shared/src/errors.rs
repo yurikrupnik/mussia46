@@ -32,6 +32,8 @@ pub enum AppError {
 
     #[error("Redis error: {0}")]
     Redis(#[from] redis::RedisError),
+    #[error("Redis error: {0}")]
+    R2d2(#[from] r2d2::Error),
 
     #[error("Postgres connection error: {0}")]
     Postgres(#[from] sqlx::Error),
@@ -71,6 +73,16 @@ impl IntoResponse for AppError {
         let (status, error_message, details, code) = match &self {
             AppError::SerdeJson(e) => {
                 let error_code = 211;
+                error!(error_code = error_code, "Serde json parsing error: {:?}", e);
+                (
+                    StatusCode::INTERNAL_SERVER_ERROR,
+                    e.to_string(),
+                    None,
+                    error_code,
+                )
+            }
+            AppError::R2d2(e) => {
+                let error_code = 251;
                 error!(error_code = error_code, "Serde json parsing error: {:?}", e);
                 (
                     StatusCode::INTERNAL_SERVER_ERROR,

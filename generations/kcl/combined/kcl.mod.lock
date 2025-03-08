@@ -1,4 +1,12 @@
 [dependencies]
+  [dependencies.bucket]
+    name = "bucket"
+    full_name = "bucket_0.0.2"
+    version = "0.0.2"
+    sum = "ndQ2CGKLFnzfi7vgbrBEBVwMU+fvoLOGm8XLLbblEdc="
+    reg = "docker.io"
+    repo = "yurikrupnik/exist_kcl_package1"
+    oci_tag = "0.0.2"
   [dependencies.crossplane]
     name = "crossplane"
     full_name = "crossplane_1.17.3"

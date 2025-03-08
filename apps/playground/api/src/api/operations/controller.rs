@@ -294,14 +294,14 @@ use tracing::field::AsField;
 use ts_rs::TS;
 
 pub async fn delete() -> impl IntoResponse {
-    let params = [("org", "bar"), ("bucket", "quux")];
-    let client = reqwest::Client::new();
-    let res = client
-        .post("http://localhost:8086/api/v2/delete")
-        // .form(&params)
-        .send()
-        .await
-        .expect("faked");
+    // let params = [("org", "bar"), ("bucket", "quux")];
+    // let client = reqwest::Client::new();
+    // let res = client
+    //     .post("http://localhost:8086/api/v2/delete")
+    //     // .form(&params)
+    //     .send()
+    //     .await
+    //     .expect("faked");
     // Json(res)
     Json(json!({"status": "success"}))
 }

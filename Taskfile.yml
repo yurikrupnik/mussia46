@@ -43,11 +43,11 @@ tasks:
       - kubectl wait "providers.pkg.crossplane.io/provider-gcp-storage" --for=condition=Healthy --timeout=600s
       - kubectl wait "providers.pkg.crossplane.io/provider-gcp-storage" --for=condition=Installed --timeout=600s
       - kubectl apply -f manifests/gitops/dependecies/crossplane/provider-config.yaml
-      - kubectl apply -f manifests/gitops/dependecies/crossplane/storage.yaml
-      - kubectl apply -f manifests/gitops/dependecies/crossplane/example-bucket.yaml
+#      - kubectl apply -f manifests/gitops/dependecies/crossplane/storage.yaml
+#      - kubectl apply -f manifests/gitops/dependecies/crossplane/example-bucket.yaml
 #      new kcl module for stoage
-      - kubectl apply -f generations/kcl/my_package/new-storage.yaml
-      - kubectl apply -f manifests/gitops/dependecies/crossplane/example-bucket-kcl.yaml
+      #- kubectl apply -f generations/kcl/my_package/new-storage.yaml
+      #- kubectl apply -f manifests/gitops/dependecies/crossplane/example-bucket-kcl.yaml
       #      deploy new cue package and resources then
 #      - kubectl apply -f manifests/gitops/dependecies/crossplane/index.yaml
 #      - kubectl apply -f manifests/gitops/infra/keda/

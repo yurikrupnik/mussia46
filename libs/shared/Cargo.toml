@@ -4,6 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+r2d2.workspace = true
 axum.workspace = true
 tokio.workspace = true
 serde.workspace = true
@@ -24,6 +25,15 @@ utoipa-scalar.workspace = true
 utoipa-rapidoc.workspace = true
 utoipa-redoc.workspace = true
 tower-http.workspace = true
+rand = "0.8.5"
+rayon = "1.10"
+dashmap = "6.1.0"
+
+[dev-dependencies]
+criterion = "0.5.1"
 
 
+[[bench]]
+name = "sorting_benchmark"
+harness = false
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html

@@ -1,0 +1,17 @@
+apiVersion: yurikrupnik.com/v1alpha1
+kind: StorageClaim
+metadata:
+  name: crossplane-yurasik
+spec:
+  id: crossplane-yurasik
+  parameters:
+    location: europe-west2
+    description: main network for my usage
+  compositionSelector:
+    matchLabels:
+      provider: gcp
+---
+
+# Buckets
+# input - custom resource params
+# output

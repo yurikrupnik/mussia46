@@ -14,6 +14,7 @@ tracing = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
 thiserror = { workspace = true }
+r2d2 = { workspace = true }
 bb8 = { workspace = true, optional = false }
 bb8-redis = { workspace = true, optional = false }
 redis = { workspace = true, optional = false }
@@ -24,6 +25,7 @@ influxdb2 = { workspace = true, optional = false }
 #influxdb2-derive.workspace = true
 #chrono.workspace = true
 mongodb = { workspace = true, optional = false }
+polars = {version = "0.46.0", features = ["azure", "sql", "default", "aws", "gcp"]}
 
 #[features]
 ###default = ["proc_macros", "general", "axum", "tracing", "serde", "thiserror", "serde_json", "bb8", "bb8-redis", "redis", "mongodb", "tokio", "sqlx", "influxdb2", "influxdb2-derive", "chrono"]

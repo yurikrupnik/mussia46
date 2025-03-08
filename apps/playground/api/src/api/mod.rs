@@ -6,7 +6,7 @@ use sql_book::router::router as sql_book_router;
 use sse::router::router as see_router;
 use std::time::Duration;
 use task::router::router as task_router;
-use task_redis_pubsub::router::router as task_redis_pubsub_router;
+// use task_redis_pubsub::router::router as task_redis_pubsub_router;
 use task_redis_response::router::router as task_redis_response_router;
 use todo::router::router as todo_router;
 use tokio::time::sleep;
@@ -16,7 +16,7 @@ pub mod operations;
 pub mod sql_book;
 pub mod sse;
 pub mod task;
-pub mod task_redis_pubsub;
+// pub mod task_redis_pubsub;
 pub mod task_redis_response;
 pub mod todo;
 
@@ -30,6 +30,6 @@ pub fn routes() -> Router<AppState> {
         .merge(sql_book_router())
         .merge(see_router())
         .merge(task_router())
-        .merge(task_redis_pubsub_router())
+        // .merge(task_redis_pubsub_router())
         .merge(task_redis_response_router())
 }

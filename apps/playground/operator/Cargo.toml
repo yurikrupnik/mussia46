@@ -11,7 +11,7 @@ serde.workspace = true
 tokio.workspace = true
 kube.workspace = true
 k8s-openapi.workspace = true
-http = "1.2.0"
+http.workspace = true
 
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html

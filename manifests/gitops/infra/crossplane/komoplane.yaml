@@ -1,11 +1,11 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: komoplane
+  name: ui
   namespace: argocd # ArgoCD control namespace
 spec:
   destination:
-    namespace: komoplane # Target namespace where resources will be deployed
+    namespace: crossplane-system  # Target namespace where resources will be deployed
     server: https://kubernetes.default.svc # Cluster to deploy to (default cluster)
   source:
     repoURL: https://helm-charts.komodor.io # Replace with the actual Helm repository URL
