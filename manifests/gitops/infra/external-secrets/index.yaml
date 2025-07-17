@@ -10,7 +10,7 @@ spec:
   source:
     repoURL: https://charts.external-secrets.io # Replace with the actual Helm repository URL
     chart: external-secrets
-    targetRevision: 0.9.* # Version of the chart to deploy
+    targetRevision: 0.18.* # Version of the chart to deploy
     helm:
       releaseName: external-secrets
       parameters:
